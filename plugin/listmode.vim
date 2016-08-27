@@ -1,7 +1,8 @@
 " vim: set fdm=marker et ts=4 sw=4 sts=4:
-" listmode.vim - Vim: List mode for pandoc version of markdown
+" listmode.vim - Vim: List mode, especially for pandoc version of markdown
 " Author:        bwhelm
 " Version:       0.1
+" License:       GPL2 or later
 
 if exists('g:ListMode_loaded') || &cp
     finish
@@ -17,7 +18,7 @@ command! ListModeReformat call listmode#ReformatList()
 " Default keymappings {{{1
 
 if !exists('g:vim_listmode_map_prefix')
-	let g:vim_listmode_map_prefix = '<leader>'
+	let g:vim_listmode_map_prefix = '<Leader>'
 endif
 
 if !exists('g:vim_listmode_toggle')
@@ -28,8 +29,8 @@ if !exists('g:vim_listmode_reformat')
     let g:vim_listmode_reformat = g:vim_listmode_map_prefix."lr"
 endif
 
-execute "noremap" g:vim_listmode_toggle ":ListModeToggle<CR>"
-execute "noremap" g:vim_listmode_reformat ":ListModeReformat<CR>"
+execute "noremap <unique>" g:vim_listmode_toggle ":ListModeToggle<CR>"
+execute "noremap <unique>" g:vim_listmode_reformat ":ListModeReformat<CR>"
 
 if !exists('g:ListMode_indent_normal')
     let g:ListMode_indent_normal = "<Tab>"

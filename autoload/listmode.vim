@@ -63,23 +63,23 @@ endfunction
 
 function! listmode#IsOList(line) " {{{1
     " Check if line is ordered list
-	return match(a:line, '^\s*[0-9]\+\.\s') >= 0
+	return match(a:line, '^\s*(\?[0-9]\+[.)]\s') >= 0
 endfunction
 
-function! listmode#IsSpecialListOne(line) " {{{1
+function! listmode#IsNumberedList(line) " {{{1
     " Check if line is special list 1
 	return match(a:line, '^\s*#\+\.\s') >= 0
 endfunction
 
-function! listmode#IsSpecialListTwo(line) " {{{1
+function! listmode#IsExampleList(line) " {{{1
     " Check if line is special list 2
-	return match(a:line, '^\s*@[A-z0-9\-_]*\.\s') >= 0
+	return match(a:line, '^\s*(\?@[A-z0-9\-_]*[.)]\s') >= 0
 endfunction
 
-function! listmode#FindSL2Key(line) " {{{1
+function! listmode#FindExampleListKey(line) " {{{1
 	" Find the key for special list 2 (such as: '@key. item')
-	let l:myMatch = matchlist(a:line, '^\s*\(@[A-z0-9\-_]*\.\)\s')
-	return l:myMatch[1] . ' '
+	let l:myMatch = matchlist(a:line, '^\s*(\?\(@[A-z0-9\-_]*\)[.)]\s')
+	return l:myMatch[1] . '. '
 endfunction
 
 function! listmode#IsDescList(lines) " {{{1
@@ -103,7 +103,7 @@ endfunction
 
 function! listmode#FindListType(line) " {{{1
     " Find type of list of current line. ('ol' = ordered list; 'ul' = unordered
-    " list; 'sl1' = special list #1; 'sl2' = special list #2; 'dl' = description
+    " list; 'nl' = numbered lists ('#. '); 'el' = special list #2; 'dl' = description
     " list.
 	if listmode#IsWhiteSpace(a:line)
 		return 'empty'
@@ -111,10 +111,10 @@ function! listmode#FindListType(line) " {{{1
 		return 'ol'
 	elseif listmode#IsUList(a:line)
 		return 'ul'
-	elseif listmode#IsSpecialListOne(a:line)
-		return 'sl1'
-	elseif listmode#IsSpecialListTwo(a:line)
-		return 'sl2'
+	elseif listmode#IsNumberedList(a:line)
+		return 'nl'
+	elseif listmode#IsExampleList(a:line)
+		return 'el'
 	elseif match(a:line, '^\s*[~:]\s') >= 0
 		return 'dl'
 	else
@@ -125,8 +125,8 @@ endfunction
 function! listmode#LineContent(line) " {{{1
     " Return content of line, stripped of any white space and list indicators at
     " the beginning of the line.
-	if index(['ol','ul','sl1','sl2','empty'], listmode#FindListType(a:line)) >= 0
-		let l:lineStart = match(a:line, '\(^\s*\([0-9#]\+\.\|@[A-z0-9\-_]*\.\|[-*+]\)\s\+\)\@<=.*')
+	if index(['ol','ul','nl','el','empty'], listmode#FindListType(a:line)) >= 0
+		let l:lineStart = match(a:line, '\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+]\)\s\+\)\@<=.*')
 		return a:line[l:lineStart:]
 	else  " Must be description list or nolist
 		let l:lineStart = match(a:line, '\S')
@@ -250,7 +250,7 @@ function! listmode#InitializeListFunctions() "{{{1
         let s:currentListNumbering = 0
     endif
     " To convert from listType to the needed (pandoc) markdown
-    let s:listDef = {'ol': '1. ', 'ul': '- ', 'sl1': '#. ', 'sl2': '@. ', 'empty': '', 'dl': '', 'nolist': ''} 
+    let s:listDef = {'ol': '1. ', 'ul': '- ', 'nl': '#. ', 'el': '@. ', 'empty': '', 'dl': '', 'nolist': ''} 
 endfunction
 
 function! listmode#ReformatList() " {{{1
@@ -273,7 +273,7 @@ function! listmode#ReformatList() " {{{1
 		let [l:listType, l:listLevel] = s:listStructure[key]
 		" If l:listType == 'empty', I want to leave it alone, so that gets
 		" skipped in next conditional.
-		if index(['ul', 'ol', 'sl1', 'sl2', 'dl'], l:listType) >= 0
+		if index(['ul', 'ol', 'nl', 'el', 'dl'], l:listType) >= 0
 			let [l:LRType, l:LRNumber] = l:levelRecord[l:listLevel]
 			if l:listLevel > l:previousLevel  " Beginning of sublist
 				if l:listType == 'ol'
@@ -304,9 +304,9 @@ function! listmode#ReformatList() " {{{1
 			let l:newItemPrefix = repeat("\t", l:listLevel)
 			if l:LRType == 'ol'
 				let l:newItemPrefix .= l:LRNumber . '. '
-			elseif l:LRType == 'sl2'
-				if listmode#IsSpecialListTwo(s:bufferText[l:key])
-					let l:newItemPrefix .= listmode#FindSL2Key(s:bufferText[l:key])
+			elseif l:LRType == 'el'
+				if listmode#IsExampleList(s:bufferText[l:key])
+					let l:newItemPrefix .= listmode#FindExampleListKey(s:bufferText[l:key])
 					"let l:mymatch = matchlist(s:bufferText[l:key], '^\s*\(@[A-z0-9\-_]*\.\)\s')
 					"let l:newItemPrefix .= l:mymatch[1] . ' '
 				else
@@ -340,9 +340,9 @@ function! listmode#IndentLine() " {{{1
 		return
 	else
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
-		if s:currentListType == 'sl2'
+		if s:currentListType == 'el'
 			"let l:prefix .= '@. '
-			let l:prefix .= listmode#FindSL2Key(s:line)
+			let l:prefix .= listmode#FindExampleListKey(s:line)
 		else
 			let l:prefix .= s:listDef[s:currentListType]
 		endif
@@ -365,8 +365,8 @@ function! listmode#OutdentLine() " {{{1
 		return
 	elseif s:currentLineLevel > 0  " We need to outdent
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) - 1)
-		if s:currentListType == 'sl2'
-			let l:prefix .= listmode#FindSL2Key(s:line)
+		if s:currentListType == 'el'
+			let l:prefix .= listmode#FindExampleListKey(s:line)
 		else
 			let l:prefix .= s:listDef[s:currentListType]
 		endif
@@ -390,7 +390,7 @@ function! listmode#ChangeListType() " {{{1
     "
 	" l:listRotation specifies how list types rotate: ordered lists become unordered lists; everything else becomes an ordered list.	
     call listmode#InitializeListFunctions()
-	let l:listRotation = {'ol': '- ', 'ul': '1. ', 'sl2': '1. ', 'sl1': '1. ', 'empty': '1. ', 'dl': '1. '}
+	let l:listRotation = {'ol': '- ', 'ul': '1. ', 'el': '1. ', 'nl': '1. ', 'empty': '1. ', 'dl': '1. '}
 	if s:listEndLineNumber == 0
 		echo "Not in a list so cannot change list type!"
 		return
@@ -452,7 +452,7 @@ function! listmode#NewListItem() " {{{1
             let l:newLineType = 'ul'
             for l:lineIndex in range(s:lineNumber - 1, s:listBeginLineNumber, -1)
                 let l:thisLine = s:bufferText[l:lineIndex]
-                if listmode#FindLevel(l:thisLine) == 0 && index(['ol', 'ul', 'sl1', 'sl2'], listmode#FindListType(l:thisLine)) >= 0
+                if listmode#FindLevel(l:thisLine) == 0 && index(['ol', 'ul', 'nl', 'el'], listmode#FindListType(l:thisLine)) >= 0
                     let l:newLineType = listmode#FindListType(l:thisLine)
                     break
                 endif
