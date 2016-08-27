@@ -530,13 +530,13 @@ function! ToggleListMode()
 		let b:listmode_changetype_normal = maparg("<D-8>", "n", 0, 1)
 		let b:listmode_changetype_insert = maparg("<D-8>", "i", 0, 1)
 		execute "nnoremap <buffer> <silent>" g:ListMode_indent_normal ":call IndentLine()<CR>"
-		execute "inoremap <buffer> <silent>" g:ListMode_indent_insert "<C-o>:call IndentLine()<CR>"
+		execute "inoremap <buffer> <silent>" g:ListMode_indent_insert "<C-\\><C-o>:call IndentLine()<CR>"
 		execute "nnoremap <buffer> <silent>" g:ListMode_outdent_normal ":call OutdentLine()<CR>"
-		execute "inoremap <buffer> <silent>" g:ListMode_outdent_insert "<C-o>:call OutdentLine()<CR>"
+		execute "inoremap <buffer> <silent>" g:ListMode_outdent_insert "<C-\\><C-o>:call OutdentLine()<CR>"
 		execute "nnoremap <buffer> <silent>" g:ListMode_newitem_normal ":call NewListItem()<CR>"
-		execute "inoremap <buffer> <silent>" g:ListMode_newitem_insert "<C-o>:call NewListItem()<CR>"
+		execute "inoremap <buffer> <silent>" g:ListMode_newitem_insert "<C-\\><C-O>:call NewListItem()<CR>"
 		execute "nnoremap <buffer> <silent>" g:ListMode_changetype_normal ":call ChangeListType()<CR>"
-		execute "inoremap <buffer> <silent>" g:ListMode_changetype_insert "<C-o>:call ChangeListType()<CR>"
+		execute "inoremap <buffer> <silent>" g:ListMode_changetype_insert "<C-\\><C-o>:call ChangeListType()<CR>"
 		let b:listmode = 1
 		echo "Now entering vim list mode"
 	endif
