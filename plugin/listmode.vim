@@ -12,6 +12,7 @@ let g:ListMode_loaded = 1
 
 " Define commands
 command! ListModeToggle call listmode#ToggleListMode()
+command! ListModeReformat call listmode#ReformatList()
 
 " Default keymappings {{{1
 
@@ -28,7 +29,7 @@ if !exists('g:vim_listmode_reformat')
 endif
 
 execute "noremap" g:vim_listmode_toggle ":ListModeToggle<CR>"
-execute "noremap" g:vim_listmode_reformat ":call ReformatList()<CR>"
+execute "noremap" g:vim_listmode_reformat ":ListModeReformat<CR>"
 
 if !exists('g:ListMode_indent_normal')
     let g:ListMode_indent_normal = "<Tab>"

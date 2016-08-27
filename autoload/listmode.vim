@@ -76,6 +76,12 @@ function! listmode#IsSpecialListTwo(line) " {{{1
 	return match(a:line, '^\s*@[A-z0-9\-_]*\.\s') >= 0
 endfunction
 
+function! listmode#FindSL2Key(line) " {{{1
+	" Find the key for special list 2 (such as: '@key. item')
+	let l:myMatch = matchlist(a:line, '^\s*\(@[A-z0-9\-_]*\.\)\s')
+	return l:myMatch[1] . ' '
+endfunction
+
 function! listmode#IsDescList(lines) " {{{1
     " Check if lines (list of single lines) contains a description list
 	let l:text = join(a:lines, "\n")
@@ -244,7 +250,7 @@ function! listmode#InitializeListFunctions() "{{{1
         let s:currentListNumbering = 0
     endif
     " To convert from listType to the needed (pandoc) markdown
-    let s:listDef = {'ol': '1. ', 'ul': '- ', 'sl1': '#. ', 'sl2': '@', 'empty': '', 'dl': '', 'nolist': ''} 
+    let s:listDef = {'ol': '1. ', 'ul': '- ', 'sl1': '#. ', 'sl2': '@. ', 'empty': '', 'dl': '', 'nolist': ''} 
 endfunction
 
 function! listmode#ReformatList() " {{{1
@@ -267,7 +273,7 @@ function! listmode#ReformatList() " {{{1
 		let [l:listType, l:listLevel] = s:listStructure[key]
 		" If l:listType == 'empty', I want to leave it alone, so that gets
 		" skipped in next conditional.
-		if index(['ul', 'ol', 'sp1', 'sp2', 'dl'], l:listType) >= 0
+		if index(['ul', 'ol', 'sl1', 'sl2', 'dl'], l:listType) >= 0
 			let [l:LRType, l:LRNumber] = l:levelRecord[l:listLevel]
 			if l:listLevel > l:previousLevel  " Beginning of sublist
 				if l:listType == 'ol'
@@ -298,6 +304,14 @@ function! listmode#ReformatList() " {{{1
 			let l:newItemPrefix = repeat("\t", l:listLevel)
 			if l:LRType == 'ol'
 				let l:newItemPrefix .= l:LRNumber . '. '
+			elseif l:LRType == 'sl2'
+				if listmode#IsSpecialListTwo(s:bufferText[l:key])
+					let l:newItemPrefix .= listmode#FindSL2Key(s:bufferText[l:key])
+					"let l:mymatch = matchlist(s:bufferText[l:key], '^\s*\(@[A-z0-9\-_]*\.\)\s')
+					"let l:newItemPrefix .= l:mymatch[1] . ' '
+				else
+					let l:newItemPrefix .= s:listDef[l:LRType]
+				endif
 			else
 				let l:newItemPrefix .= s:listDef[l:LRType]
 			endif
@@ -327,7 +341,8 @@ function! listmode#IndentLine() " {{{1
 	else
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
 		if s:currentListType == 'sl2'
-			let l:prefix .= '@. '
+			"let l:prefix .= '@. '
+			let l:prefix .= listmode#FindSL2Key(s:line)
 		else
 			let l:prefix .= s:listDef[s:currentListType]
 		endif
@@ -350,7 +365,11 @@ function! listmode#OutdentLine() " {{{1
 		return
 	elseif s:currentLineLevel > 0  " We need to outdent
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) - 1)
-		let l:prefix .= s:listDef[s:currentListType]
+		if s:currentListType == 'sl2'
+			let l:prefix .= listmode#FindSL2Key(s:line)
+		else
+			let l:prefix .= s:listDef[s:currentListType]
+		endif
         let l:newLine = l:prefix
         if match(s:line, '\S') >= 0
             let l:newLine .= listmode#LineContent(s:line)
@@ -427,7 +446,8 @@ function! listmode#NewListItem() " {{{1
     let l:lineContent = listmode#LineContent(s:line)
 	if s:currentListType == "empty"
         " If the current line really is empty (rather than whitespace), need
-        " to add new line below with 
+        " to add new line below with arbitrary list type. (This will be fixed
+		" when calling listmode#ReformatList().)
         if s:line == ""
             let l:newLineType = 'ul'
             for l:lineIndex in range(s:lineNumber - 1, s:listBeginLineNumber, -1)
@@ -465,10 +485,8 @@ function! listmode#NewListItem() " {{{1
     if s:currentListType == "nolist" || l:linePrefixLength < s:cursorColumn - 1
         " If cursor is placed after start of line content: need to create new line below
         " ... unless we're not in a list.
-        let l:beforeCursor = listmode#LineContent(s:line[:s:cursorColumn - 1])
-        let l:afterCursor = s:line[s:cursorColumn:]
-        let l:newLine = l:prefix . l:beforeCursor
-        let l:nextLine = l:prefix . l:afterCursor
+        let l:newLine = s:line[:s:cursorColumn - 1]
+        let l:nextLine = l:prefix . s:line[s:cursorColumn:]
         let l:newLineNumber = s:lineNumber + 1
         let l:newCursorColumn = len(l:prefix)
     else  " Cursor is placed before start of line content: need to create new line above
