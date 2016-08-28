@@ -15,20 +15,20 @@ in markdown or pandoc.
 ListMode will facilitate entering lists by remapping (by default) "\<CR\>",
 "\<Tab\>" and "\<S-Tab\>" to automatically create new list items, indent the
 current list item, or outdent the current list item. In doing this, the list
-prefixes are automatically updated to reflect what the new list item should
-be. Thus, when in an ordered list, hitting "\<CR\>" at the end of a list item
-will create a new list item with the next numbered item already in place.
-"\<CR\>" will also split lines when the cursor is in the middle of a line, and
-create new items above the current line when the cursor is at the beginning
-of the line. If the line is empty (other than the list prefix), hitting
-"\<CR\>" will automatically outdent the item (changing the list type as
-necessary), or, if the line is not indented, remove the list prefix.
+prefixes are automatically updated to reflect what the new list item should be.
+Thus, when in an ordered list, hitting "\<CR\>" at the end of a list item will
+create a new list item with the next numbered item already in place. "\<CR\>"
+will also split lines when the cursor is in the middle of a line, and create
+new items above the current line when the cursor is at the beginning of the
+line. If the line is empty (other than the list prefix), hitting "\<CR\>" will
+automatically outdent the item (changing the list type as necessary), or, if
+the line is not indented, remove the list prefix.
 
 Similarly, hitting "\<Tab\>" or "\<S-Tab\>" will indent or outdent list items,
 changing the list type as appropriate.
 
-The list type of all siblings of the current item can be changed by typing
-(by default) "\<D-8\>"; parents and children will be unaffected.
+The list type of all siblings of the current item can be changed by typing (by
+default) "\<D-8\>"; parents and children will be unaffected.
 
 The current list can be reformatted from normal mode by typing (by default)
 "\<Leader\>lr" (for "Listmode Reformat").
@@ -39,8 +39,8 @@ current mappings for "\<CR\>", "\<Tab\>", "\<S-Tab\>", and "\<D-8\>" and remaps
 them to ListMode functions. When it is toggled off, the old mappings are
 restored.
 
-Toggling ListMode on optionally changes the folds in a document. This option
-is set through *g:ListMode_folding*.
+Toggling ListMode on optionally changes the folds in a document. This option is
+set through *g:ListMode_folding*.
 
 
 ## OVERVIEW OF MARKDOWN (AND PANDOC) LISTS
@@ -84,14 +84,14 @@ with either \<Tab\> or 4 spaces:
     2. Item 2
 
 Pandoc (\<pandoc.org\>) extends CommonMark's lists by allowing unordered lists
-also to start with "+", and allowing ordered lists also to start with a
-number enclosed in parentheses followed by whitespace, like: "(1) ". In
-addition, pandoc adds several other list types. First, ordered lists can
-begin with "#. "; these behave otherwise just like standard ordered lists.
+also to start with "+", and allowing ordered lists also to start with a number
+enclosed in parentheses followed by whitespace, like: "(1) ". In addition,
+pandoc adds several other list types. First, ordered lists can begin with
+"#. "; these behave otherwise just like standard ordered lists.
 
-A second type of ordered list -- an "example list" is more special. In place
-of a number, they use "@", which is optionally followed by a key (a sequence
-of letters (A-Za-z), numbers (0-9) or a hyphen ("-") or underscore ("\_"). For
+A second type of ordered list -- an "example list" is more special. In place of
+a number, they use "@", which is optionally followed by a key (a sequence of
+letters (A-Za-z), numbers (0-9) or a hyphen ("-") or underscore ("\_"). For
 example:
 
     @. Item 1
@@ -113,9 +113,9 @@ line contains the term being defined; the second line contains either a colon
     Term
     : Definition.
 
-Note that definition lists *must* be surrounded by blank lines (containing
-only whitespace) before and after. This is not true of other list types. For
-more details, see \<http://pandoc.org/MANUAL.html#lists\>.
+Note that definition lists *must* be surrounded by blank lines (containing only
+whitespace) before and after. This is not true of other list types. For more
+details, see \<http://pandoc.org/MANUAL.html#lists\>.
 
 
 ## CONFIGURATION
@@ -125,9 +125,9 @@ The following variables can be configured (with defaults given):
 - **g:vim_listmode_map_prefix** = '\<Leader\>'. This is used by the next two
   settings.
 
-- **g:vim_listmode_toggle** = **g:vim_listmode_map_prefix** . "lm". This toggles
-  between listmode key mappings and standard key mappings, but only in normal
-  mode.
+- **g:vim_listmode_toggle** = **g:vim_listmode_map_prefix** . "lm". This
+  toggles between listmode key mappings and standard key mappings, but only in
+  normal mode.
 
 - **g:vim_listmode_reformat** = **g:vim_listmode_map_prefix** . "lr". This
   reformats the current list, but only in normal mode.
@@ -162,7 +162,8 @@ The following variables can be configured (with defaults given):
 - **g:ListMode_changetype_insert** = "\<D-8\>". This changes the list type of all
   siblings of the current list item. For insert mode.
 
-- **g:ListMode_folding**=1. This determines whether ListMode changes the document's folds while it is in effect. (1 is on; 0 is off.)
+- **g:ListMode_folding**=1. This determines whether ListMode changes the
+  document's folds while it is in effect. (1 is on; 0 is off.)
 
 
 ## LIMITATIONS

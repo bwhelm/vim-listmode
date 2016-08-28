@@ -16,31 +16,31 @@ FUNCTION OF LISTMODE                                        *listmode-function*
 ListMode will facilitate entering lists by remapping (by default) "<CR>",
 "<Tab>" and "<S-Tab>" to automatically create new list items, indent the
 current list item, or outdent the current list item. In doing this, the list
-prefixes are automatically updated to reflect what the new list item should
-be. Thus, when in an ordered list, hitting "<CR>" at the end of a list item
-will create a new list item with the next numbered item already in place.
-"<CR>" will also split lines when the cursor is in the middle of a line, and
-create new items above the current line when the cursor is at the beginning
-of the line. If the line is empty (other than the list prefix), hitting
-"<CR>" will automatically outdent the item (changing the list type as
-necessary), or, if the line is not indented, remove the list prefix.
+prefixes are automatically updated to reflect what the new list item should be.
+Thus, when in an ordered list, hitting "<CR>" at the end of a list item will
+create a new list item with the next numbered item already in place. "<CR>"
+will also split lines when the cursor is in the middle of a line, and create
+new items above the current line when the cursor is at the beginning of the
+line. If the line is empty (other than the list prefix), hitting "<CR>" will
+automatically outdent the item (changing the list type as necessary), or, if
+the line is not indented, remove the list prefix.
 
 Similarly, hitting "<Tab>" or "<S-Tab>" will indent or outdent list items,
 changing the list type as appropriate.
 
-The list type of all siblings of the current item can be changed by typing
-(by default) "<D-8>"; parents and children will be unaffected.
+The list type of all siblings of the current item can be changed by typing (by
+default) "<D-8>"; parents and children will be unaffected.
 
 The current list can be reformatted from normal mode by typing (by default)
 "<Leader>lr" (for "Listmode Reformat").
 
 ListMode is toggled on or off from normal mode by typing (by default)
 "<Leader>lm" (for "ListMode"). When ListMode is toggled on, it saves the
-current mappings for "<CR>", "<Tab>", "<S-Tab>", and "<D-8>" and remaps them
-to ListMode functions. When it is toggled off, the old mappings are restored.
+current mappings for "<CR>", "<Tab>", "<S-Tab>", and "<D-8>" and remaps them to
+ListMode functions. When it is toggled off, the old mappings are restored.
 
-Toggling ListMode on optionally changes the folds in a document. This option
-is set through |g:ListMode_folding|.
+Toggling ListMode on optionally changes the folds in a document. This option is
+set through |g:ListMode_folding|.
 
 
 OVERVIEW OF MARKDOWN (AND PANDOC) LISTS               *listmode-markdown-lists*
@@ -84,14 +84,14 @@ with either <Tab> or 4 spaces:
     2. Item 2
 
 Pandoc (<pandoc.org>) extends CommonMark's lists by allowing unordered lists
-also to start with "+", and allowing ordered lists also to start with a
-number enclosed in parentheses followed by whitespace, like: "(1) ". In
-addition, pandoc adds several other list types. First, ordered lists can
-begin with "#. "; these behave otherwise just like standard ordered lists.
+also to start with "+", and allowing ordered lists also to start with a number
+enclosed in parentheses followed by whitespace, like: "(1) ". In addition,
+pandoc adds several other list types. First, ordered lists can begin with
+"#. "; these behave otherwise just like standard ordered lists.
 
-A second type of ordered list -- an "example list" is more special. In place
-of a number, they use "@", which is optionally followed by a key (a sequence
-of letters (A-Za-z), numbers (0-9) or a hyphen ("-") or underscore ("_"). For
+A second type of ordered list -- an "example list" is more special. In place of
+a number, they use "@", which is optionally followed by a key (a sequence of
+letters (A-Za-z), numbers (0-9) or a hyphen ("-") or underscore ("_"). For
 example:
 
     @. Item 1
@@ -113,9 +113,9 @@ line contains the term being defined; the second line contains either a colon
     Term
     : Definition.
 
-Note that definition lists *must* be surrounded by blank lines (containing
-only whitespace) before and after. This is not true of other list types. For
-more details, see <http://pandoc.org/MANUAL.html#lists>.
+Note that definition lists *must* be surrounded by blank lines (containing only
+whitespace) before and after. This is not true of other list types. For more
+details, see <http://pandoc.org/MANUAL.html#lists>.
 
 
 CONFIGURATION                                          *listmode-configuration*
@@ -150,13 +150,15 @@ Used for insert mode.
 
 |g:ListMode_newitem_normal|="<CR>"                  *g:ListMode_newitem_normal*
 This inserts a new list item at the same level. If the cursor is in the main
-text, the text is split at the cursor, with the text after the cursor
-appearing on the next line. If the cursor is in the list prefix, a new list
-item is created above the current line. For normal mode.
+text, the text is split at the cursor, with the text after the cursor appearing
+on the next line. If the cursor is in the list prefix, a new list item is
+created above the current line. For normal mode.
 
 |g:ListMode_newitem_insert|="<CR>"                  *g:ListMode_newitem_insert*
 This inserts a new list item at the same level. If the cursor is in the main
-text, the text is split at the cursor, with the text after the cursor appearing on the next line. If the cursor is in the list prefix, a new list item is created above the current line. For insert mode.
+text, the text is split at the cursor, with the text after the cursor appearing
+on the next line. If the cursor is in the list prefix, a new list item is
+created above the current line. For insert mode.
 
 |g:ListMode_changetype_normal|="<D-8>"           *g:ListMode_changetype_normal*
 This changes the list type of all siblings of the current list item. For normal
