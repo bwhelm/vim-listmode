@@ -27,6 +27,13 @@ function! listmode#ToggleListMode()
 		call listmode#RestoreMapping(b:listmode_changetype_normal, '<D-8>', 'n')
 		call listmode#RestoreMapping(b:listmode_changetype_insert, '<D-8>', 'i')
 		let b:listmode=0
+
+		" Restore folding
+		if g:ListMode_folding != 0
+			let &l:foldmethod=b:oldfoldmethod
+			let &l:foldexpr=b:oldfoldexpr
+			let &l:foldtext=b:oldfoldtext
+		endif
 		echo "Now leaving vim list mode"
 	else				" Need to save keymappings and generate new ones
 		let b:listmode_indent_normal = maparg("<Tab>", "n", 0, 1)
@@ -46,6 +53,17 @@ function! listmode#ToggleListMode()
 		execute "nnoremap <buffer> <silent>" g:ListMode_changetype_normal ":call listmode#ChangeListType()<CR>"
 		execute "inoremap <buffer> <silent>" g:ListMode_changetype_insert "<C-\\><C-o>:call listmode#ChangeListType()<CR>"
 		let b:listmode = 1
+
+		" Set up folding for later restore
+		if g:ListMode_folding != 0
+			let b:oldfoldmethod=&foldmethod
+			let b:oldfoldexpr=&foldexpr
+			let b:oldfoldtext=&foldtext
+			setlocal foldmethod=expr
+			setlocal foldexpr=listmode#GetListModeFold(v:lnum)
+			setlocal foldtext=listmode#FoldText()
+		endif
+
 		echo "Now entering vim list mode"
 	endif
 endfunction
@@ -90,7 +108,7 @@ endfunction
 
 function! listmode#IsWhiteSpace(line) " {{{1
     " Check if line contains only whitespace
-	return match(a:line, '^\s*$') >= 0
+	return a:line =~ '^\s*$'
 endfunction
 
 function! listmode#FindLevel(line) " {{{1
@@ -501,3 +519,40 @@ function! listmode#NewListItem() " {{{1
 	call listmode#ReformatList()
 endfunction
 " }}}
+
+" ==============================
+" Folding code. Adapted from <http://learnvimscriptthehardway.stevelosh.com/chapters/49.html>
+
+function! listmode#NextNonBlankLine(lnum)
+    let l:current = a:lnum + 1
+    while l:current <= line('$')
+        if !listmode#IsWhiteSpace(getline(l:current))
+            return l:current
+        endif
+        let l:current += 1
+    endwhile
+    return -2
+endfunction
+
+function! listmode#GetListModeFold(lnum)
+	let l:thisLine = getline(a:lnum)
+	if listmode#IsWhiteSpace(l:thisLine)
+		return '-1'
+	endif
+	if !empty(listmode#FindListType(l:thisLine)) || listmode#FindLevel(l:thisLine) > 0
+		let l:thisIndent = listmode#FindLevel(l:thisLine) + 1
+		let l:nextIndent = listmode#FindLevel(getline(listmode#NextNonBlankLine(a:lnum))) + 1
+		
+		if l:nextIndent <= l:thisIndent
+			return l:thisIndent
+		else  "  l:nextIndent > l:thisIndent
+			return '>' . l:nextIndent
+		endif
+	endif
+	return 0
+endfunction
+
+function! listmode#FoldText()
+	let l:foldLineCount = v:foldend - v:foldstart
+	return v:folddashes . getline(v:foldstart)[:max([0, winwidth(0) - 24])] . " / " . l:foldLineCount . " sub-items / "
+endfunction

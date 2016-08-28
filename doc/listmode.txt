@@ -5,10 +5,43 @@ in markdown or pandoc.
 
 CONTENTS                                                    *listmode-contents*
 
-    1. Overview of Markdown (and Pandoc) Lists ...... |listmode-markdown-lists|
-    2. Function of ListMode ............................... |listmode-function|
+    1. Function of ListMode ............................... |listmode-function|
+    2. Overview of Markdown (and Pandoc) Lists ...... |listmode-markdown-lists|
     3. Configuration ................................. |listmode-configuration|
     4. Limitations ..................................... |listmode-limitations|
+
+
+FUNCTION OF LISTMODE                                        *listmode-function*
+
+ListMode will facilitate entering lists by remapping (by default) "<CR>",
+"<Tab>" and "<S-Tab>" to automatically create new list items, indent the
+current list item, or outdent the current list item. In doing this, the list
+prefixes are automatically updated to reflect what the new list item should
+be. Thus, when in an ordered list, hitting "<CR>" at the end of a list item
+will create a new list item with the next numbered item already in place.
+"<CR>" will also split lines when the cursor is in the middle of a line, and
+create new items above the current line when the cursor is at the beginning
+of the line. If the line is empty (other than the list prefix), hitting
+"<CR>" will automatically outdent the item (changing the list type as
+necessary), or, if the line is not indented, remove the list prefix.
+
+Similarly, hitting "<Tab>" or "<S-Tab>" will indent or outdent list items,
+changing the list type as appropriate.
+
+The list type of all siblings of the current item can be changed by typing
+(by default) "<D-8>"; parents and children will be unaffected.
+
+The current list can be reformatted from normal mode by typing (by default)
+"<Leader>lr" (for "Listmode Reformat").
+
+ListMode is toggled on or off from normal mode by typing (by default)
+"<Leader>lm" (for "ListMode"). When ListMode is toggled on, it saves the
+current mappings for "<CR>", "<Tab>", "<S-Tab>", and "<D-8>" and remaps them
+to ListMode functions. When it is toggled off, the old mappings are restored.
+
+Toggling ListMode on optionally changes the folds in a document. This option
+is set through |g:ListMode_folding|.
+
 
 OVERVIEW OF MARKDOWN (AND PANDOC) LISTS               *listmode-markdown-lists*
 
@@ -85,89 +118,72 @@ only whitespace) before and after. This is not true of other list types. For
 more details, see <http://pandoc.org/MANUAL.html#lists>.
 
 
-FUNCTION OF LISTMODE                                        *listmode-function*
-
-ListMode will facilitate entering lists by remapping (by default) "<CR>",
-"<Tab>" and "<S-Tab>" to automatically create new list items, indent the
-current list item, or outdent the current list item. In doing this, the list
-prefixes are automatically updated to reflect what the new list item should
-be. Thus, when in an ordered list, hitting "<CR>" at the end of a list item
-will create a new list item with the next numbered item already in place.
-"<CR>" will also split lines when the cursor is in the middle of a line, and
-create new items above the current line when the cursor is at the beginning
-of the line. If the line is empty (other than the list prefix), hitting
-"<CR>" will automatically outdent the item (changing the list type as
-necessary), or, if the line is not indented, remove the list prefix.
-
-Similarly, hitting "<Tab>" or "<S-Tab>" will indent or outdent list items,
-changing the list type as appropriate.
-
-The list type of all siblings of the current item can be changed by typing
-(by default) "<D-8>"; parents and children will be unaffected.
-
-The current list can be reformatted from normal mode by typing (by default)
-"<Leader>lr" (for "Listmode Reformat").
-
-ListMode is toggled on or off from normal mode by typing (by default)
-"<Leader>lm" (for "ListMode"). When ListMode is toggled on, it saves the
-current mappings for "<CR>", "<Tab>", "<S-Tab>", and "<D-8>" and remaps them
-to ListMode functions. When it is toggled off, the old mappings are restored.
-
-
 CONFIGURATION                                          *listmode-configuration*
 
 The following variables can be configured (with defaults given):
 
-- |g:vim_listmode_map_prefix| = '<Leader>'. This is used by the next two
-  settings.
+|g:vim_listmode_map_prefix|='<Leader>'              *g:vim_listmode_map_prefix*
+This is used by the next two settings.
 
-- |g:vim_listmode_toggle| = |g:vim_listmode_map_prefix| . "lm". This toggles
-  between listmode key mappings and standard key mappings, but only in normal
-  mode.
+|g:vim_listmode_toggle|=|g:vim_listmode_map_prefix|."lm" *g:vim_listmode_toggle*
+This toggles between listmode key mappings and standard key mappings, but only
+in normal mode.
 
-- |g:vim_listmode_reformat| = |g:vim_listmode_map_prefix| . "lr". This
-  reformats the current list, but only in normal mode.
+|g:vim_listmode_reformat|=|g:vim_listmode_map_prefix|."lr" *g:vim_listmode_reformat*
+This reformats the current list, but only in normal mode.
 
-- |g:ListMode_indent_normal| = "<Tab>". This indents the current line, leaving
-  the cursor where it was in the text. Used for normal mode.
+|g:ListMode_indent_normal|="<Tab>"                   *g:ListMode_indent_normal*
+This indents the current line, leaving the cursor where it was in the text.
+Used for normal mode.
 
-- |g:ListMode_indent_insert| = "<Tab>". This indents the current line, leaving
-  the cursor where it was in the text. Used for insert mode.
+|g:ListMode_indent_insert|="<Tab>"                   *g:ListMode_indent_insert*
+This indents the current line, leaving the cursor where it was in the text.
+Used for insert mode.
 
-- |g:ListMode_outdent_normal| = "<S-Tab>". This outdents the current line,
-  leaving the cursor where it was in the text. Used for normal mode.
+|g:ListMode_outdent_normal|="<S-Tab>"               *g:ListMode_outdent_normal*
+This outdents the current line, leaving the cursor where it was in the text.
+Used for normal mode.
 
-- |g:ListMode_outdent_insert| = "<S-Tab>". This outdents the current line,
-  leaving the cursor where it was in the text. Used for insert mode.
+|g:ListMode_outdent_insert|="<S-Tab>"               *g:ListMode_outdent_insert*
+This outdents the current line, leaving the cursor where it was in the text.
+Used for insert mode.
 
-- |g:ListMode_newitem_normal| = "<CR>". This inserts a new list item at the
-  same level. If the cursor is in the main text, the text is split at the
-  cursor, with the text after the cursor appearing on the next line. If the
-  cursor is in the list prefix, a new list item is created above the current
-  line. For normal mode.
+|g:ListMode_newitem_normal|="<CR>"                  *g:ListMode_newitem_normal*
+This inserts a new list item at the same level. If the cursor is in the main
+text, the text is split at the cursor, with the text after the cursor
+appearing on the next line. If the cursor is in the list prefix, a new list
+item is created above the current line. For normal mode.
 
-- |g:ListMode_newitem_insert| = "<CR>". This inserts a new list item at the
-  same level. If the cursor is in the main text, the text is split at the
-  cursor, with the text after the cursor appearing on the next line. If the
-  cursor is in the list prefix, a new list item is created above the current
-  line. For insert mode.
+|g:ListMode_newitem_insert|="<CR>"                  *g:ListMode_newitem_insert*
+This inserts a new list item at the same level. If the cursor is in the main
+text, the text is split at the cursor, with the text after the cursor appearing on the next line. If the cursor is in the list prefix, a new list item is created above the current line. For insert mode.
 
-- |g:ListMode_changetype_normal| = "<D-8>". This changes the list type of all 
-  siblings of the current list item. For normal mode.
+|g:ListMode_changetype_normal|="<D-8>"           *g:ListMode_changetype_normal*
+This changes the list type of all siblings of the current list item. For normal
+mode.
 
-- |g:ListMode_changetype_insert| = "<D-8>". This changes the list type of all
-  siblings of the current list item. For insert mode.
+|g:ListMode_changetype_insert|="<D-8>"           *g:ListMode_changetype_insert*
+This changes the list type of all siblings of the current list item. For insert
+mode.
+
+|g:ListMode_folding|=1                                     *g:ListMode_folding*
+This determines whether ListMode changes the document's folds while it is in
+effect. (1 is on; 0 is off.)
 
 
 LIMITATIONS                                              *listmode-limitations*
 
-1. ListMode automatically reformats lists to a common style, using "-" rather
+1. ListMode assumes lines are soft wrapped, so that each line contains a single
+   list item. If list items span more than one line, lists will not be
+   identified properly.
+
+2. ListMode automatically reformats lists to a common style, using "-" rather
    than "*" or "+" for unordered lists and "1. " rather than "1) " or "(1) "
-   for ordered lists, for example. What style this is is hardcoded. It should
+   for ordered lists, for example. What style this is is hard-coded. It should
    be a user-defined option.
 
-2. The mappings from one list type to another used when changing list types is
+3. The mappings from one list type to another used when changing list types is
    hardcoded. This should be a user-defined option.
 
-3. Pandoc definition lists can have multiple definitions, and the term and
+4. Pandoc definition lists can have multiple definitions, and the term and
    definition can be separated by blank lines. These options are not supported.

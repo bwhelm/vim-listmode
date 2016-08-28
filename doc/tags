@@ -1,3 +1,15 @@
+g:ListMode_changetype_insert	listmode.txt	/*g:ListMode_changetype_insert*
+g:ListMode_changetype_normal	listmode.txt	/*g:ListMode_changetype_normal*
+g:ListMode_folding	listmode.txt	/*g:ListMode_folding*
+g:ListMode_indent_insert	listmode.txt	/*g:ListMode_indent_insert*
+g:ListMode_indent_normal	listmode.txt	/*g:ListMode_indent_normal*
+g:ListMode_newitem_insert	listmode.txt	/*g:ListMode_newitem_insert*
+g:ListMode_newitem_normal	listmode.txt	/*g:ListMode_newitem_normal*
+g:ListMode_outdent_insert	listmode.txt	/*g:ListMode_outdent_insert*
+g:ListMode_outdent_normal	listmode.txt	/*g:ListMode_outdent_normal*
+g:vim_listmode_map_prefix	listmode.txt	/*g:vim_listmode_map_prefix*
+g:vim_listmode_reformat	listmode.txt	/*g:vim_listmode_reformat*
+g:vim_listmode_toggle	listmode.txt	/*g:vim_listmode_toggle*
 listmode-configuration	listmode.txt	/*listmode-configuration*
 listmode-contents	listmode.txt	/*listmode-contents*
 listmode-function	listmode.txt	/*listmode-function*

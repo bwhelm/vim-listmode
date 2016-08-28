@@ -5,10 +5,43 @@ in markdown or pandoc.
 
 ## CONTENTS
 
-    1. Overview of Markdown (and Pandoc) Lists
-    2. Function of ListMode
-    3. Configuration
-    4. Limitations
+	1. Function of ListMode
+	2. Overview of Markdown (and Pandoc) Lists
+	3. Configuration
+	4. Limitations
+
+## FUNCTION OF LISTMODE
+
+ListMode will facilitate entering lists by remapping (by default) "\<CR\>",
+"\<Tab\>" and "\<S-Tab\>" to automatically create new list items, indent the
+current list item, or outdent the current list item. In doing this, the list
+prefixes are automatically updated to reflect what the new list item should
+be. Thus, when in an ordered list, hitting "\<CR\>" at the end of a list item
+will create a new list item with the next numbered item already in place.
+"\<CR\>" will also split lines when the cursor is in the middle of a line, and
+create new items above the current line when the cursor is at the beginning
+of the line. If the line is empty (other than the list prefix), hitting
+"\<CR\>" will automatically outdent the item (changing the list type as
+necessary), or, if the line is not indented, remove the list prefix.
+
+Similarly, hitting "\<Tab\>" or "\<S-Tab\>" will indent or outdent list items,
+changing the list type as appropriate.
+
+The list type of all siblings of the current item can be changed by typing
+(by default) "\<D-8\>"; parents and children will be unaffected.
+
+The current list can be reformatted from normal mode by typing (by default)
+"\<Leader\>lr" (for "Listmode Reformat").
+
+ListMode is toggled on or off from normal mode by typing (by default)
+"\<Leader\>lm" (for "ListMode"). When ListMode is toggled on, it saves the
+current mappings for "\<CR\>", "\<Tab\>", "\<S-Tab\>", and "\<D-8\>" and remaps
+them to ListMode functions. When it is toggled off, the old mappings are
+restored.
+
+Toggling ListMode on optionally changes the folds in a document. This option
+is set through *g:ListMode_folding*.
+
 
 ## OVERVIEW OF MARKDOWN (AND PANDOC) LISTS
 
@@ -85,35 +118,6 @@ only whitespace) before and after. This is not true of other list types. For
 more details, see \<http://pandoc.org/MANUAL.html#lists\>.
 
 
-## FUNCTION OF LISTMODE
-
-ListMode will facilitate entering lists by remapping (by default) "\<CR\>",
-"\<Tab\>" and "\<S-Tab\>" to automatically create new list items, indent the
-current list item, or outdent the current list item. In doing this, the list
-prefixes are automatically updated to reflect what the new list item should
-be. Thus, when in an ordered list, hitting "\<CR\>" at the end of a list item
-will create a new list item with the next numbered item already in place.
-"\<CR\>" will also split lines when the cursor is in the middle of a line, and
-create new items above the current line when the cursor is at the beginning
-of the line. If the line is empty (other than the list prefix), hitting
-"\<CR\>" will automatically outdent the item (changing the list type as
-necessary), or, if the line is not indented, remove the list prefix.
-
-Similarly, hitting "\<Tab\>" or "\<S-Tab\>" will indent or outdent list items,
-changing the list type as appropriate.
-
-The list type of all siblings of the current item can be changed by typing
-(by default) "\<D-8\>"; parents and children will be unaffected.
-
-The current list can be reformatted from normal mode by typing (by default)
-"\<Leader\>lr" (for "Listmode Reformat").
-
-ListMode is toggled on or off from normal mode by typing (by default)
-"\<Leader\>lm" (for "ListMode"). When ListMode is toggled on, it saves the
-current mappings for "\<CR\>", "\<Tab\>", "\<S-Tab\>", and "\<D-8\>" and remaps them
-to ListMode functions. When it is toggled off, the old mappings are restored.
-
-
 ## CONFIGURATION
 
 The following variables can be configured (with defaults given):
@@ -158,12 +162,18 @@ The following variables can be configured (with defaults given):
 - **g:ListMode_changetype_insert** = "\<D-8\>". This changes the list type of all
   siblings of the current list item. For insert mode.
 
+- **g:ListMode_folding**=1. This determines whether ListMode changes the document's folds while it is in effect. (1 is on; 0 is off.)
+
 
 ## LIMITATIONS
 
-1. ListMode automatically reformats lists to a common style, using "-" rather
+1. ListMode assumes lines are soft wrapped, so that each line contains a single
+   list item. If list items span more than one line, lists will not be
+   identified properly.
+
+2. ListMode automatically reformats lists to a common style, using "-" rather
    than "\*" or "+" for unordered lists and "1. " rather than "1) " or "(1) "
-   for ordered lists, for example. What style this is is hardcoded. It should
+   for ordered lists, for example. What style this is is hard-coded. It should
    be a user-defined option.
 
 2. The mappings from one list type to another used when changing list types is

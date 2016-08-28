@@ -1,7 +1,7 @@
 " vim: set fdm=marker et ts=4 sw=4 sts=4:
 " listmode.vim - Vim: List mode, especially for pandoc version of markdown
 " Author:        bwhelm
-" Version:       0.1
+" Version:       0.2
 " License:       GPL2 or later
 
 if exists('g:ListMode_loaded') || &cp
@@ -62,6 +62,10 @@ endif
 
 if !exists('g:ListMode_changetype_insert')
     let g:ListMode_changetype_insert = "<D-8>"
+endif
+
+if !exists('g:ListMode_folding')
+    let g:ListMode_folding = 1
 endif
 " }}}
 
