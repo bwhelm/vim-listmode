@@ -29,9 +29,6 @@ if !exists('g:vim_listmode_reformat')
     let g:vim_listmode_reformat = g:vim_listmode_map_prefix."lr"
 endif
 
-execute "noremap <unique>" g:vim_listmode_toggle ":ListModeToggle<CR>"
-execute "noremap <unique>" g:vim_listmode_reformat ":ListModeReformat<CR>"
-
 if !exists('g:ListMode_indent_normal')
     let g:ListMode_indent_normal = "<Tab>"
 endif
@@ -67,5 +64,29 @@ endif
 if !exists('g:ListMode_folding')
     let g:ListMode_folding = 1
 endif
+
+if !exists('g:ListMode_textobj')
+    let g:ListMode_textobj = "l"
+elseif len(g:ListMode_textobj) != 1
+    echohl WarningMsg | echoerr "ERROR: g:ListMode_textobj must be a single character. Setting to 'l'." | echohl None
+    let g:ListMode_textobj = "l"
+endif
+
+execute "noremap <unique>" g:vim_listmode_toggle ":ListModeToggle<CR>"
+execute "noremap <unique>" g:vim_listmode_reformat ":ListModeReformat<CR>"
 " }}}
 
+" =============================================================================
+" Text Objects -- define these only if vim-textobj-user is loaded
+" =============================================================================
+
+if exists('textobj#user#plugin')
+    call textobj#user#plugin('listmode', {
+    \   '-': {
+    \   'select-a-function': 'listmode#CurrentListItemA',
+    \   'select-a': 'a' . g:ListMode_textobj,
+    \   'select-i-function': 'listmode#CurrentListItemI',
+    \   'select-i': 'i' . g:ListMode_textobj,
+    \   },
+    \ })
+endif

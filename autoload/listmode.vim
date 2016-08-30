@@ -1,3 +1,9 @@
+" vim: set fdm=marker et ts=4 sw=4 sts=4:
+
+" =============================================================================
+" Cope with mappings
+" =============================================================================
+
 " Restores mapping saved in mapDict {{{1
 function! listmode#RestoreMapping(mapDict, key, mode)
 	exe a:mode . 'unmap <buffer> ' . a:key
@@ -67,12 +73,11 @@ function! listmode#ToggleListMode()
 		echo "Now entering vim list mode"
 	endif
 endfunction
+" }}}
 
-
-"function! listmode#IsUOList(line) " {{{1
-"    " Check if line is unordered or ordered list
-"	return match(a:line, '^\s*\([0-9#]\+\.\|@[A-z0-9\-_]*\.\|[-*+]\)\s') >= 0
-"endfunction
+" =============================================================================
+" Main ListMode code
+" =============================================================================
 
 function! listmode#IsUList(line) " {{{1
     " Check if line is unordered list
@@ -408,7 +413,7 @@ function! listmode#ChangeListType() " {{{1
     "
 	" l:listRotation specifies how list types rotate: ordered lists become unordered lists; everything else becomes an ordered list.	
     call listmode#InitializeListFunctions()
-	let l:listRotation = {'ol': '- ', 'ul': '1. ', 'el': '1. ', 'nl': '1. ', 'empty': '1. ', 'dl': '1. '}
+	let l:listRotation = {'ol': '- ', 'ul': '@. ', 'el': '1. ', 'nl': '1. ', 'empty': '1. '}
 	if s:listEndLineNumber == 0
 		echo "Not in a list so cannot change list type!"
 		return
@@ -520,10 +525,54 @@ function! listmode#NewListItem() " {{{1
 endfunction
 " }}}
 
-" ==============================
-" Folding code. Adapted from <http://learnvimscriptthehardway.stevelosh.com/chapters/49.html>
+" =============================================================================
+" Functions defining list text object
+" =============================================================================
 
-function! listmode#NextNonBlankLine(lnum)
+function! listmode#CurrentListItemA() " {{{1
+    let l:thisLine = getline('.')
+    if empty(l:thisLine)
+        return 0
+    endif
+    normal! 0
+    let [a, b, c, d] = getpos('.')
+    let l:startPosition = match(l:thisLine, '\(^\s*\)\@<=\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+]\)\s\+')
+    normal! $
+    let l:endPosition = getpos('.')
+    if l:startPosition == -1
+        echo "Not an ordered or unordered list item!"
+        return 0
+    else
+        return ['v', [a, b, l:startPosition + 1, d], l:endPosition]
+    endif
+endfunction
+
+function! listmode#CurrentListItemI() " {{{1
+    let l:thisLine = getline('.')
+    if empty(l:thisLine)
+        return 0
+    endif
+    normal! 0
+    let [a, b, c, d] = getpos('.')
+    let l:startPosition = match(l:thisLine, '\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+]\)\s\+\)\@<=\S')
+    normal! $
+    let l:endPosition = getpos('.')
+    if l:startPosition == -1
+        echo "Not an ordered or unordered list item!"
+        return 0
+    else
+        return ['v', [a, b, l:startPosition + 1, d], l:endPosition]
+    endif
+endfunction
+" }}}
+
+" =============================================================================
+" Folding code. Adapted from:
+" <http://learnvimscriptthehardway.stevelosh.com/chapters/49.html>
+" =============================================================================
+
+function! listmode#NextNonBlankLine(lnum) " {{{1
+    " Find line number of next non-blank line
     let l:current = a:lnum + 1
     while l:current <= line('$')
         if !listmode#IsWhiteSpace(getline(l:current))
@@ -534,7 +583,8 @@ function! listmode#NextNonBlankLine(lnum)
     return -2
 endfunction
 
-function! listmode#GetListModeFold(lnum)
+function! listmode#GetListModeFold(lnum) " {{{1
+    " Find fold level of line at given line number
 	let l:thisLine = getline(a:lnum)
 	if listmode#IsWhiteSpace(l:thisLine)
 		return '-1'
@@ -552,7 +602,8 @@ function! listmode#GetListModeFold(lnum)
 	return 0
 endfunction
 
-function! listmode#FoldText()
+function! listmode#FoldText() " {{{1
+    " Provide text for line when folded
 	let l:foldLineCount = v:foldend - v:foldstart
 	return v:folddashes . getline(v:foldstart)[:max([0, winwidth(0) - 24])] . " / " . l:foldLineCount . " sub-items / "
 endfunction
