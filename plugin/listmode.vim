@@ -80,13 +80,11 @@ execute "noremap <unique>" g:vim_listmode_reformat ":ListModeReformat<CR>"
 " Text Objects -- define these only if vim-textobj-user is loaded
 " =============================================================================
 
-if exists('textobj#user#plugin')
-    call textobj#user#plugin('listmode', {
-    \   '-': {
-    \   'select-a-function': 'listmode#CurrentListItemA',
-    \   'select-a': 'a' . g:ListMode_textobj,
-    \   'select-i-function': 'listmode#CurrentListItemI',
-    \   'select-i': 'i' . g:ListMode_textobj,
-    \   },
-    \ })
-endif
+call textobj#user#plugin('listmode', {
+\   '-': {
+\   'select-a-function': 'listmode#CurrentListItemA',
+\   'select-a': 'a' . g:ListMode_textobj,
+\   'select-i-function': 'listmode#CurrentListItemI',
+\   'select-i': 'i' . g:ListMode_textobj,
+\   },
+\ })
