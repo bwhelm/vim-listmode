@@ -505,7 +505,7 @@ function! listmode#NewListItem() " {{{1
     endif
     let l:linePrefixLength = len(s:line) - len(l:lineContent)
     let l:prefix = repeat("\t", s:currentLineLevel) . s:listDef[s:currentListType]
-    if s:currentListType == "nolist" || l:linePrefixLength < s:cursorColumn - 1
+    if (s:currentListType == "nolist" && len(s:line) == 0) || l:linePrefixLength <= s:cursorColumn - 1
         " If cursor is placed after start of line content: need to create new line below
         " ... unless we're not in a list.
         let l:newLine = s:line[:s:cursorColumn - 1]
