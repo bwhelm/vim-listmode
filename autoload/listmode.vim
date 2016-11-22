@@ -6,7 +6,7 @@
 
 " Restores mapping saved in mapDict {{{1
 function! listmode#RestoreMapping(mapDict, key, mode)
-	exe a:mode . "unmap <buffer> " . a:key
+	execute a:mode . "unmap <buffer> " . a:key
 	if !empty(a:mapDict)
 		exe (a:mapDict.noremap ? a:mapDict.mode . "noremap" : a:mapDict.mode ."map") .
 			\ (a:mapDict.buffer ? " <buffer>" : "") .
@@ -32,6 +32,10 @@ function! listmode#ToggleListMode()
 		call listmode#RestoreMapping(b:listmode_newitem_insert, "<CR>", "i")
 		call listmode#RestoreMapping(b:listmode_changetype_normal, "<D-8>", "n")
 		call listmode#RestoreMapping(b:listmode_changetype_insert, "<D-8>", "i")
+        if g:ListMode_remap_oO
+            call listmode#RestoreMapping(b:listmode_o_mapping, "o", "n")
+            call listmode#RestoreMapping(b:listmode_O_mapping, "O", "n")
+        endif
 		let b:listmode=0
 
 		" Restore folding
@@ -58,6 +62,13 @@ function! listmode#ToggleListMode()
 		execute "inoremap <buffer> <silent>" g:ListMode_newitem_insert "<C-\\><C-o>:call listmode#NewListItem()<CR>"
 		execute "nnoremap <buffer> <silent>" g:ListMode_changetype_normal ":call listmode#ChangeListType()<CR>"
 		execute "inoremap <buffer> <silent>" g:ListMode_changetype_insert "<C-\\><C-o>:call listmode#ChangeListType()<CR>"
+        if g:ListMode_remap_oO
+            let b:listmode_o_mapping = maparg("o", "n", 0, 1)
+            let b:listmode_O_mapping = maparg("O", "n", 0, 1)
+            nmap <buffer> o A<CR>
+            nmap <buffer> O I<CR>
+        endif
+
 		let b:listmode = 1
 
 		" Set up folding for later restore

@@ -72,6 +72,10 @@ elseif len(g:ListMode_textobj) != 1
     let g:ListMode_textobj = "l"
 endif
 
+if !exists('g:ListMode_remap_oO')
+    let g:ListMode_remap_oO = 1
+endif
+
 execute "noremap <unique>" g:vim_listmode_toggle ":ListModeToggle<CR>"
 execute "noremap <unique>" g:vim_listmode_reformat ":ListModeReformat<CR>"
 " }}}

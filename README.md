@@ -39,17 +39,19 @@ current mappings for "\<CR\>", "\<Tab\>", "\<S-Tab\>", and "\<D-8\>" and remaps
 them to ListMode functions. When it is toggled off, the old mappings are
 restored.
 
+ListMode can be configured to remap "o" and "O" to insert list headers as
+appropriate. This option is set through *g:ListMode_remap_oO*.
+
 Toggling ListMode on optionally changes the folds in a document. This option is
 set through *g:ListMode_folding*.
 
 ListMode defines a list item text object, so that in normal mode typing "cil"
 will delete the current list item, not including the list prefix, and put vim
 into insert mode. Similarly, typing "dal" in normal mode will delete the
-current list item including the list prefix. The character that designates
-the list text object is defined by *g:ListMode_textobj* and is "l" by default.
-This feature requires that the vim-textobj-user plugin
+current list item including the list prefix. The character that designates the
+list text object is defined by *g:ListMode_textobj* and is "l" by default. This
+feature requires that the vim-textobj-user plugin
 (<http://www.vim.org/scripts/script.php?script_id=2100>) be installed.
-
 
 
 ## OVERVIEW OF MARKDOWN (AND PANDOC) LISTS
@@ -170,6 +172,10 @@ The following variables can be configured (with defaults given):
 
 - **g:ListMode_changetype_insert** = "\<D-8\>". This changes the list type of all
   siblings of the current list item. For insert mode.
+
+- **g:ListMode_remap_oO**=1. This determines whether invoking ListMode remaps
+  "o" and "O" to insert lines below or above the current line with the
+  appropriate list header.
 
 - **g:ListMode_folding**=1. This determines whether ListMode changes the
   document's folds while it is in effect. (1 is on; 0 is off.)
