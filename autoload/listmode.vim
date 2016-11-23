@@ -127,6 +127,11 @@ function! listmode#IsWhiteSpace(line) " {{{1
 	return a:line =~ '^\s*$'
 endfunction
 
+function! listmode#IsListSeparator(line) "{{{1
+    " Check if line is a list separator (`<!-- -->`)
+    return a:line =~ '^\s*<!-- -->\s*$'
+endfunction
+
 function! listmode#FindLevel(line) " {{{1
     " Find indentation level of line
 	let l:nonSpaceIndex = match(a:line, '\S')
@@ -149,7 +154,9 @@ function! listmode#FindListType(line) " {{{1
 		return "nl"
 	elseif listmode#IsExampleList(a:line)
 		return "el"
-	elseif match(a:line, '^\s*[~:]\s') >= 0
+    elseif listmode#IsListSeparator(a:line)
+        return "ls"
+    elseif a:line =~ '^\s*[~:]\s'
 		return "dl"
 	else
 		return 0  " If we know it's a list item, this will be a "dl"
@@ -162,7 +169,7 @@ function! listmode#LineContent(line) " {{{1
 	if index(["ol","ul","nl","el","empty"], listmode#FindListType(a:line)) >= 0
 		let l:lineStart = match(a:line, '\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+]\)\s\+\)\@<=.*')
 		return a:line[l:lineStart:]
-	else  " Must be description list or nolist
+	else  " Must be description list or list separator or nolist
 		let l:lineStart = match(a:line, '\S')
         if l:lineStart == -1
             return ""
@@ -195,9 +202,13 @@ function! listmode#FindListScope() " {{{1
 		let l:listStructure = {}
 		while lineIndex >= 0
 			let l:listType = listmode#FindListType(s:bufferText[l:lineIndex])
-			if !empty(l:listType) && l:listType != "dl"
-				let l:listStructure[l:lineIndex] = [l:listType, listmode#FindLevel(s:bufferText[l:lineIndex])]
-				let l:lineIndex -= 1
+            let l:lineLevel = listmode#FindLevel(s:bufferText[l:lineIndex])
+            if l:listType == "ls" && l:lineLevel == 0
+                let l:begin = max([lineIndex + 1, 0])
+                break
+			elseif !empty(l:listType) && l:listType != "dl"
+                let l:listStructure[l:lineIndex] = [l:listType, l:lineLevel]
+                let l:lineIndex -= 1
 			elseif listmode#IsDescList(s:bufferText[max([0, l:lineIndex - 1]):l:lineIndex + 2 + (l:lineIndex == -1)])
 				let l:listStructure[l:lineIndex - 1] = ["dl", listmode#FindLevel(s:bufferText[l:lineIndex])]
 				let l:listStructure[l:lineIndex] = ["dl", listmode#FindLevel(s:bufferText[l:lineIndex])]
@@ -212,8 +223,12 @@ function! listmode#FindListScope() " {{{1
 		let l:lineIndex = l:lineNumber + 1
 		while l:lineIndex < len(s:bufferText)
 			let l:listType = listmode#FindListType(s:bufferText[l:lineIndex])
-			if !empty(l:listType)
-				let l:listStructure[l:lineIndex] = [l:listType, listmode#FindLevel(s:bufferText[l:lineIndex])]
+            let l:lineLevel = listmode#FindLevel(s:bufferText[l:lineIndex])
+            if l:listType == "ls" && l:lineLevel == 0
+                let l:end = lineIndex -1
+                break
+            elseif !empty(l:listType)
+                let l:listStructure[l:lineIndex] = [l:listType, l:lineLevel]
 				let l:lineIndex += 1
 			elseif listmode#IsDescList(s:bufferText[max([0, l:lineIndex - 1]):l:lineIndex + 2 + (l:lineIndex == -1)])
 				let l:listStructure[l:lineIndex] = ["dl", listmode#FindLevel(s:bufferText[l:lineIndex])]
@@ -284,7 +299,7 @@ function! listmode#InitializeListFunctions() "{{{1
         let s:currentListNumbering = 0
     endif
     " To convert from listType to the needed (pandoc) markdown
-    let s:listDef = {"ol": "1. ", "ul": "- ", "nl": "#. ", "el": "@. ", "empty": "", "dl": "", "nolist": ""} 
+    let s:listDef = {"ol": "1. ", "ul": "- ", "nl": "#. ", "el": "@. ", "empty": "", "dl": "", "nolist": "", "ls": ""} 
 endfunction
 
 function! listmode#ReformatList() " {{{1
@@ -300,14 +315,15 @@ function! listmode#ReformatList() " {{{1
 	for i in range(20)
 		let l:levelRecord += [["empty", 0]]
 	endfor
+    let l:listSeparatorFlag = 0
 	let l:previousLevel = -1
 	let l:newList = []
     let l:newCursorColumn = s:cursorColumn
 	for l:key in range(s:listBeginLineNumber, s:listEndLineNumber)
-		let [l:listType, l:listLevel] = s:listStructure[key]
+		let [l:listType, l:listLevel] = s:listStructure[l:key]
 		" If l:listType == "empty", I want to leave it alone, so that gets
 		" skipped in next conditional.
-		if index(["ul", "ol", "nl", "el", "dl"], l:listType) >= 0
+		if index(["ul", "ol", "nl", "el", "dl", "ls"], l:listType) >= 0
 			let [l:LRType, l:LRNumber] = l:levelRecord[l:listLevel]
 			if l:listLevel > l:previousLevel  " Beginning of sublist
 				if l:listType == "ol"
@@ -316,7 +332,7 @@ function! listmode#ReformatList() " {{{1
 					let l:levelRecord[l:listLevel] = [l:listType, 0]
 				endif
 			elseif l:listLevel == l:previousLevel  " List sibling
-				if l:LRType == "ol"
+				if l:LRType == "ol" && l:listType != "ls"
 					let l:levelRecord[l:listLevel] = ["ol", l:LRNumber + 1]
 				endif
 			elseif l:listLevel < l:previousLevel  " List parent
@@ -334,15 +350,25 @@ function! listmode#ReformatList() " {{{1
 			endif
 			" Now need to construct list item
 			let [l:LRType, l:LRNumber] = l:levelRecord[l:listLevel]
+            if l:listSeparatorFlag && l:listType != "empty"
+                let l:LRType = l:listType
+                if l:listType == "ol"
+                    let l:LRNumber = 1
+                else
+                    let l:LRNumber = 0
+                endif
+                let l:levelRecord[l:listLevel] = [l:LRType, l:LRNumber]
+                let l:listSeparatorFlag = 0
+            endif
 			let l:itemText = listmode#LineContent(s:bufferText[l:key])
 			let l:newItemPrefix = repeat("\t", l:listLevel)
-			if l:LRType == "ol"
+            if l:listType == "ls"
+                let l:listSeparatorFlag = 1
+            elseif l:LRType == "ol"
 				let l:newItemPrefix .= l:LRNumber . ". "
 			elseif l:LRType == "el"
 				if listmode#IsExampleList(s:bufferText[l:key])
 					let l:newItemPrefix .= listmode#FindExampleListKey(s:bufferText[l:key])
-					"let l:mymatch = matchlist(s:bufferText[l:key], '^\s*\(@[A-z0-9\-_]*\.\)\s')
-					"let l:newItemPrefix .= l:mymatch[1] . " "
 				else
 					let l:newItemPrefix .= s:listDef[l:LRType]
 				endif
@@ -375,7 +401,6 @@ function! listmode#IndentLine() " {{{1
 	else
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
 		if s:currentListType == "el"
-			"let l:prefix .= "@. "
 			let l:prefix .= listmode#FindExampleListKey(s:line)
 		else
 			let l:prefix .= s:listDef[s:currentListType]
@@ -444,6 +469,8 @@ function! listmode#ChangeListType() " {{{1
 			if listmode#IsWhiteSpace(l:thisLine)
 			elseif l:thisLineLevel < s:currentLineLevel
 				break
+            elseif l:thisLineLevel == s:currentLineLevel && listmode#FindListType(l:thisLine) == "ls"
+                break
 			elseif l:thisLineLevel == s:currentLineLevel
 				call setline(l:index + 1, l:prefix . listmode#LineContent(l:thisLine))
 			endif
@@ -456,6 +483,8 @@ function! listmode#ChangeListType() " {{{1
 			if listmode#IsWhiteSpace(l:thisLine)
 			elseif l:thisLineLevel < s:currentLineLevel
 				break
+            elseif l:thisLineLevel == s:currentLineLevel && listmode#FindListType(l:thisLine) == "ls"
+                break
 			elseif l:thisLineLevel == s:currentLineLevel
 				call setline(l:index + 1, l:prefix . listmode#LineContent(l:thisLine))
 			endif
