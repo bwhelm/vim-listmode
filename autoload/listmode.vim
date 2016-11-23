@@ -368,7 +368,7 @@ function! listmode#IndentLine() " {{{1
 		" character, so a <tab> should be interpreted as a <tab> rather than
 		" indenting the line.
 		let l:newLine = s:line[:s:cursorColumn - 2] . "\t" . s:line[s:cursorColumn:]
-		let l:newCursorColumn = s:cursorColumn
+		let l:newCursorColumn = s:cursorColumn + 1
 	elseif s:currentListType == "dl"
 		echo "Cannot indent description lists. Hit '>>'."
 		return
