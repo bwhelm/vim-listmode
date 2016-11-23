@@ -44,7 +44,9 @@ function! listmode#ToggleListMode()
 			let &l:foldexpr=b:oldfoldexpr
 			let &l:foldtext=b:oldfoldtext
 		endif
+		echohl Comment
 		echo "Now leaving vim list mode"
+		echohl None
 	else				" Need to save keymappings and generate new ones
 		let b:listmode_indent_normal = maparg("<Tab>", "n", 0, 1)
 		let b:listmode_indent_insert = maparg("<Tab>", "i", 0, 1)
@@ -81,7 +83,9 @@ function! listmode#ToggleListMode()
 			setlocal foldtext=listmode#FoldText()
 		endif
 
+		echohl Comment
 		echo "Now entering vim list mode"
+		echohl None
 	endif
 endfunction
 " }}}
@@ -396,7 +400,9 @@ function! listmode#IndentLine() " {{{1
 		let l:newLine = s:line[:s:cursorColumn - 2] . "\t" . s:line[s:cursorColumn:]
 		let l:newCursorColumn = s:cursorColumn + 1
 	elseif s:currentListType == "dl"
+		echohl WarningMsg
 		echo "Cannot indent description lists. Hit '>>'."
+		echohl None
 		return
 	else
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
@@ -420,7 +426,9 @@ function! listmode#OutdentLine() " {{{1
     " Outdent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
 	if s:currentListType == "dl"
+		echohl WarningMsg
 		echo "Cannot outdent description lists. Hit '<<'."
+		echohl None
 		return
 	elseif s:currentLineLevel > 0  " We need to outdent
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) - 1)
@@ -435,7 +443,9 @@ function! listmode#OutdentLine() " {{{1
         endif
 		let l:newCursorColumn = listmode#PlaceCursor(s:line, l:prefix, s:cursorColumn)
 	else
+		echohl WarningMsg
 		echo "Cannot outdent any further!"
+		echohl None
         return
 	endif
 	call setline(s:lineNumber + 1, l:newLine)
@@ -451,11 +461,15 @@ function! listmode#ChangeListType() " {{{1
     call listmode#InitializeListFunctions()
 	let l:listRotation = {"ol": "- ", "ul": "@. ", "el": "1. ", "nl": "1. ", "empty": "1. "}
 	if s:listEndLineNumber == 0
+		echohl WarningMsg
 		echo "Not in a list so cannot change list type!"
+		echohl None
 		return
 	endif
 	if s:currentListType == "dl"
+		echohl WarningMsg
 		echo "Cannot change list type of description lists."
+		echohl None
 		return
 	endif
 	let l:newType = l:listRotation[s:currentListType]
@@ -580,7 +594,9 @@ function! listmode#CurrentListItemA() " {{{1
     normal! $
     let l:endPosition = getpos(".")
     if l:startPosition == -1
+		echohl WarningMsg
         echo "Not an ordered or unordered list item!"
+		echohl None
         return 0
     else
         return ["v", [a, b, l:startPosition + 1, d], l:endPosition]
@@ -598,7 +614,9 @@ function! listmode#CurrentListItemI() " {{{1
     normal! $
     let l:endPosition = getpos(".")
     if l:startPosition == -1
+		echohl WarningMsg
         echo "Not an ordered or unordered list item!"
+		echohl None
         return 0
     else
         return ["v", [a, b, l:startPosition + 1, d], l:endPosition]
