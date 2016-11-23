@@ -542,7 +542,7 @@ function! listmode#NewListItem() " {{{1
             return
         else
             call append(s:lineNumber + 1, s:line)
-            call setpos(".", [s:bufferNumber, s:lineNumber + 2, s:cursorColumn, s:cursorOffset])
+            call setpos(".", [s:bufferNumber, s:lineNumber + 2, s:cursorColumn + 1, s:cursorOffset])
             call listmode#ReformatList()
             return
         endif
