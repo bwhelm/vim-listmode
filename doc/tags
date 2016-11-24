@@ -7,7 +7,10 @@ g:ListMode_newitem_insert	listmode.txt	/*g:ListMode_newitem_insert*
 g:ListMode_newitem_normal	listmode.txt	/*g:ListMode_newitem_normal*
 g:ListMode_outdent_insert	listmode.txt	/*g:ListMode_outdent_insert*
 g:ListMode_outdent_normal	listmode.txt	/*g:ListMode_outdent_normal*
+g:ListMode_remap_oO	listmode.txt	/*g:ListMode_remap_oO*
+g:ListMode_separator_mapping	listmode.txt	/*g:ListMode_separator_mapping*
 g:ListMode_textobj	listmode.txt	/*g:ListMode_textobj*
+g:ListMode_unordered_char	listmode.txt	/*g:ListMode_unordered_char*
 g:vim_listmode_map_prefix	listmode.txt	/*g:vim_listmode_map_prefix*
 g:vim_listmode_reformat	listmode.txt	/*g:vim_listmode_reformat*
 g:vim_listmode_toggle	listmode.txt	/*g:vim_listmode_toggle*

@@ -172,6 +172,11 @@ function! listmode#FindListType(line) " {{{1
 	endif
 endfunction
 
+function! listmode#IsList(line) " {{{1
+    let l:listType = listmode#FindListType(a:line)
+    return l:listType != "0" && l:listType != "empty"
+endfunction
+
 function! listmode#LineContent(line) " {{{1
     " Return content of line, stripped of any white space and list indicators at
     " the beginning of the line.
@@ -465,18 +470,20 @@ function! listmode#ChangeListType() " {{{1
 	" l:listRotation specifies how list types rotate: ordered lists become unordered lists; everything else becomes an ordered list.	
     call listmode#InitializeListFunctions()
 	let l:listRotation = {"ol": g:ListMode_unordered_char . " ", "ul": "@. ", "el": "1. ", "nl": "1. ", "empty": "1. "}
-	if s:listEndLineNumber == 0
-		" echohl WarningMsg
-		" echo "Not in a list so cannot change list type!"
-		" echohl None
+	if s:listEndLineNumber == 0  " Not a list item...
         let l:thisLine = getline(".")
-        " FIXME: I should probably only do the latter if the current line is
-        " surrounded by blank lines.
-        let l:thisLineLevel = listmode#FindLevel(l:thisLine)
-        let l:prefix = repeat("\t", l:thisLineLevel) . "1. "
-        call setline(".", l:prefix . listmode#LineContent(l:thisLine))
-        call setpos(".", [s:bufferNumber, s:lineNumber + 1, s:cursorColumn + 3, s:cursorOffset])
-		return
+        if (listmode#LineContent(getline(s:lineNumber)) == "" || listmode#IsList(getline(s:lineNumber))) && (listmode#LineContent(getline(s:lineNumber + 2)) == "" || listmode#IsList(getline(s:lineNumber + 2)))
+            let l:thisLineLevel = listmode#FindLevel(l:thisLine)
+            let l:prefix = repeat("\t", l:thisLineLevel) . "1. "
+            call setline(".", l:prefix . listmode#LineContent(l:thisLine))
+            call setpos(".", [s:bufferNumber, s:lineNumber + 1, s:cursorColumn + 3, s:cursorOffset])
+        else
+            echohl WarningMsg
+            echom "Cannot convert to list unless surrounded by bank lines."
+            echohl None
+        endif
+        call listmode#ReformatList()
+        return
 	endif
 	if s:currentListType == "dl"
 		echohl WarningMsg
