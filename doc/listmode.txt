@@ -179,6 +179,9 @@ mode.
 This changes the list type of all siblings of the current list item. For insert
 mode.
 
+|g:ListMode_separator_mapping|="<LocalLeader>-"  *g:ListMode_separator_mapping*
+This inserts "<!-- --><CR><CR>", only in insert mode.
+
 |g:ListMode_remap_oO|=1                                   *g:ListMode_remap_oO*
 This determines whether invoking ListMode remaps "o" and "O" to insert lines
 below or above the current line with the appropriate list header.
@@ -190,6 +193,10 @@ effect. (1 is on; 0 is off.)
 |g:ListMode_textobj|="l"                                   *g:ListMode_textobj*
 This changes the character that desginates the list text object.
 
+|g:ListMode_unordered_char"="-"|                    *g:ListMode_unordered_char*
+This defines the default prefix for unordered lists. Possible values are "-",
+"+", and "*".
+
 
 LIMITATIONS                                              *listmode-limitations*
 
@@ -197,10 +204,9 @@ LIMITATIONS                                              *listmode-limitations*
    list item. If list items span more than one line, lists will not be
    identified properly.
 
-2. ListMode automatically reformats lists to a common style, using "-" rather
-   than "*" or "+" for unordered lists and "1. " rather than "1) " or "(1) "
-   for ordered lists, for example. What style this is is hard-coded. It should
-   be a user-defined option.
+2. ListMode automatically reformats lists to a common style, using "1. "
+   rather than "1) " or "(1) " for ordered lists, for example. What style this
+   is is hard-coded. It should be a user-defined option.
 
 3. The mappings from one list type to another used when changing list types is
    hardcoded. This should be a user-defined option.

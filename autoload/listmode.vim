@@ -24,18 +24,19 @@ function! listmode#ToggleListMode()
         let b:listmode = 0  " Start with listmode off by default with new buffer
     endif
 	if b:listmode		" Need to swap keymappings back
-		call listmode#RestoreMapping(b:listmode_indent_normal, "<Tab>", "n")
-		call listmode#RestoreMapping(b:listmode_indent_insert, "<Tab>", "i")
-		call listmode#RestoreMapping(b:listmode_outdent_normal, "<S-Tab>", "n")
-		call listmode#RestoreMapping(b:listmode_outdent_insert, "<S-Tab>", "i")
-		call listmode#RestoreMapping(b:listmode_newitem_normal, "<CR>", "n")
-		call listmode#RestoreMapping(b:listmode_newitem_insert, "<CR>", "i")
-		call listmode#RestoreMapping(b:listmode_changetype_normal, "<D-8>", "n")
-		call listmode#RestoreMapping(b:listmode_changetype_insert, "<D-8>", "i")
+		call listmode#RestoreMapping(b:listmode_indent_normal, g:ListMode_indent_normal, "n")
+		call listmode#RestoreMapping(b:listmode_indent_insert, g:ListMode_indent_insert, "i")
+		call listmode#RestoreMapping(b:listmode_outdent_normal, g:ListMode_outdent_normal, "n")
+		call listmode#RestoreMapping(b:listmode_outdent_insert, g:ListMode_outdent_insert, "i")
+		call listmode#RestoreMapping(b:listmode_newitem_normal, g:ListMode_newitem_normal, "n")
+		call listmode#RestoreMapping(b:listmode_newitem_insert, g:ListMode_newitem_insert, "i")
+		call listmode#RestoreMapping(b:listmode_changetype_normal, g:ListMode_changetype_normal, "n")
+		call listmode#RestoreMapping(b:listmode_changetype_insert, g:ListMode_changetype_insert, "i")
         if g:ListMode_remap_oO
             call listmode#RestoreMapping(b:listmode_o_mapping, "o", "n")
             call listmode#RestoreMapping(b:listmode_O_mapping, "O", "n")
         endif
+        call listmode#RestoreMapping(b:listmode_separator_mapping, g:ListMode_separator, "i")
 		let b:listmode=0
 
 		" Restore folding
@@ -48,14 +49,14 @@ function! listmode#ToggleListMode()
 		echo "Now leaving vim list mode"
 		echohl None
 	else				" Need to save keymappings and generate new ones
-		let b:listmode_indent_normal = maparg("<Tab>", "n", 0, 1)
-		let b:listmode_indent_insert = maparg("<Tab>", "i", 0, 1)
-		let b:listmode_outdent_normal = maparg("<S-Tab>", "n", 0, 1)
-		let b:listmode_outdent_insert = maparg("<S-Tab>", "i", 0, 1)
-		let b:listmode_newitem_normal = maparg("<CR>", "n", 0, 1)
-		let b:listmode_newitem_insert = maparg("<CR>", "i", 0, 1)
-		let b:listmode_changetype_normal = maparg("<D-8>", "n", 0, 1)
-		let b:listmode_changetype_insert = maparg("<D-8>", "i", 0, 1)
+		let b:listmode_indent_normal = maparg(g:ListMode_indent_normal, "n", 0, 1)
+		let b:listmode_indent_insert = maparg(g:ListMode_indent_insert, "i", 0, 1)
+		let b:listmode_outdent_normal = maparg(g:ListMode_outdent_normal, "n", 0, 1)
+		let b:listmode_outdent_insert = maparg(g:ListMode_outdent_insert, "i", 0, 1)
+		let b:listmode_newitem_normal = maparg(g:ListMode_newitem_normal, "n", 0, 1)
+		let b:listmode_newitem_insert = maparg(g:ListMode_newitem_insert, "i", 0, 1)
+		let b:listmode_changetype_normal = maparg(g:ListMode_changetype_normal, "n", 0, 1)
+		let b:listmode_changetype_insert = maparg(g:ListMode_changetype_insert, "i", 0, 1)
 		execute "nnoremap <buffer> <silent>" g:ListMode_indent_normal ":call listmode#IndentLine()<CR>"
 		execute "inoremap <buffer> <silent>" g:ListMode_indent_insert "<C-\\><C-o>:call listmode#IndentLine()<CR>"
 		execute "nnoremap <buffer> <silent>" g:ListMode_outdent_normal ":call listmode#OutdentLine()<CR>"
@@ -67,9 +68,13 @@ function! listmode#ToggleListMode()
         if g:ListMode_remap_oO
             let b:listmode_o_mapping = maparg("o", "n", 0, 1)
             let b:listmode_O_mapping = maparg("O", "n", 0, 1)
+            " Note: We want these to involve ListMode's <CR>, so shouldn't use
+            " nnoremap`.
             nmap <buffer> o A<CR>
             nmap <buffer> O I<CR>
         endif
+        let b:listmode_separator_mapping = maparg(g:ListMode_separator, "i", 0, 1)
+        execute "inoremap <buffer> <silent>" g:ListMode_separator "<!-- --><CR><CR>"
 
 		let b:listmode = 1
 
@@ -303,7 +308,7 @@ function! listmode#InitializeListFunctions() "{{{1
         let s:currentListNumbering = 0
     endif
     " To convert from listType to the needed (pandoc) markdown
-    let s:listDef = {"ol": "1. ", "ul": "- ", "nl": "#. ", "el": "@. ", "empty": "", "dl": "", "nolist": "", "ls": ""} 
+    let s:listDef = {"ol": "1. ", "ul": g:ListMode_unordered_char . " ", "nl": "#. ", "el": "@. ", "empty": "", "dl": "", "nolist": "", "ls": ""} 
 endfunction
 
 function! listmode#ReformatList() " {{{1
@@ -459,11 +464,18 @@ function! listmode#ChangeListType() " {{{1
     "
 	" l:listRotation specifies how list types rotate: ordered lists become unordered lists; everything else becomes an ordered list.	
     call listmode#InitializeListFunctions()
-	let l:listRotation = {"ol": "- ", "ul": "@. ", "el": "1. ", "nl": "1. ", "empty": "1. "}
+	let l:listRotation = {"ol": g:ListMode_unordered_char . " ", "ul": "@. ", "el": "1. ", "nl": "1. ", "empty": "1. "}
 	if s:listEndLineNumber == 0
-		echohl WarningMsg
-		echo "Not in a list so cannot change list type!"
-		echohl None
+		" echohl WarningMsg
+		" echo "Not in a list so cannot change list type!"
+		" echohl None
+        let l:thisLine = getline(".")
+        " FIXME: I should probably only do the latter if the current line is
+        " surrounded by blank lines.
+        let l:thisLineLevel = listmode#FindLevel(l:thisLine)
+        let l:prefix = repeat("\t", l:thisLineLevel) . "1. "
+        call setline(".", l:prefix . listmode#LineContent(l:thisLine))
+        call setpos(".", [s:bufferNumber, s:lineNumber + 1, s:cursorColumn + 3, s:cursorOffset])
 		return
 	endif
 	if s:currentListType == "dl"

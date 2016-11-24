@@ -173,6 +173,9 @@ The following variables can be configured (with defaults given):
 - **g:ListMode_changetype_insert** = "\<D-8\>". This changes the list type of all
   siblings of the current list item. For insert mode.
 
+- **g:ListMode_separator_mapping** = "<LocalLeader>-". This inserts
+  "<!-- --><CR><CR>", only in insert mode.
+
 - **g:ListMode_remap_oO**=1. This determines whether invoking ListMode remaps
   "o" and "O" to insert lines below or above the current line with the
   appropriate list header.
@@ -183,6 +186,8 @@ The following variables can be configured (with defaults given):
 - **g:ListMode_textobj**="l". This changes the character that designates the list
   text object.
 
+- **g:ListMode_unordered_char**="-". This defines the default prefix for
+  unordered lists. Possible values are "-", "+", and "*".
 
 ## LIMITATIONS
 

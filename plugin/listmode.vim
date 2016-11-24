@@ -61,6 +61,14 @@ if !exists('g:ListMode_changetype_insert')
     let g:ListMode_changetype_insert = "<D-8>"
 endif
 
+if !exists('g:ListMode_separator')
+    let g:ListMode_separator = "<LocalLeader>-"
+endif
+
+execute "noremap <unique>" g:vim_listmode_toggle ":ListModeToggle<CR>"
+execute "noremap <unique>" g:vim_listmode_reformat ":ListModeReformat<CR>"
+
+" Default Settings {{{1
 if !exists('g:ListMode_folding')
     let g:ListMode_folding = 1
 endif
@@ -68,7 +76,7 @@ endif
 if !exists('g:ListMode_textobj')
     let g:ListMode_textobj = "l"
 elseif len(g:ListMode_textobj) != 1
-    echohl WarningMsg | echoerr "ERROR: g:ListMode_textobj must be a single character. Setting to 'l'." | echohl None
+    echohl WarningMsg | echom "ERROR: g:ListMode_textobj must be a single character. Setting to 'l'." | echohl None
     let g:ListMode_textobj = "l"
 endif
 
@@ -76,8 +84,15 @@ if !exists('g:ListMode_remap_oO')
     let g:ListMode_remap_oO = 1
 endif
 
-execute "noremap <unique>" g:vim_listmode_toggle ":ListModeToggle<CR>"
-execute "noremap <unique>" g:vim_listmode_reformat ":ListModeReformat<CR>"
+if !exists('g:ListMode_unordered_char')
+    let g:ListMode_unordered_char = "-"
+else
+    if g:ListMode_unordered_char != "-" && g:ListMode_unordered_char != "+" && g:ListMode_unordered_char != "*"
+        " FIXME: How do I get this warning to be visible to user??
+        echohl WarningMsg | echom "WARNING: g:ListMode_unordered_char must be '-', '+', or '*'. Setting to '-'." | echohl None
+        let g:ListMode_unordered_char = "-"
+    endif
+endif
 " }}}
 
 " =============================================================================
