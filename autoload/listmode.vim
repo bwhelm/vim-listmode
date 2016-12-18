@@ -4,8 +4,7 @@
 " Cope with mappings
 " =============================================================================
 
-" Restores mapping saved in mapDict {{{1
-function! listmode#RestoreMapping(mapDict, key, mode)
+function! listmode#RestoreMapping(mapDict, key, mode) " Restores mapping saved in mapDict {{{1
 	execute a:mode . "unmap <buffer> " . a:key
 	if !empty(a:mapDict)
 		exe (a:mapDict.noremap ? a:mapDict.mode . "noremap" : a:mapDict.mode ."map") .
@@ -18,8 +17,7 @@ function! listmode#RestoreMapping(mapDict, key, mode)
 	endif
 endfunction
 
-" Switches between mappings {{{1
-function! listmode#ToggleListMode()
+function! listmode#ToggleListMode() " Switches between mappings {{{1
     if !exists("b:listmode")
         let b:listmode = 0  " Start with listmode off by default with new buffer
     endif
@@ -30,10 +28,10 @@ function! listmode#ToggleListMode()
 		call listmode#RestoreMapping(b:listmode_outdent_insert, g:ListMode_outdent_insert, "i")
 		call listmode#RestoreMapping(b:listmode_newitem_normal, g:ListMode_newitem_normal, "n")
 		call listmode#RestoreMapping(b:listmode_newitem_insert, g:ListMode_newitem_insert, "i")
-		call listmode#RestoreMapping(b:listmode_changetype_forward_normal, g:ListMode_changetype_normal, "n")
-		call listmode#RestoreMapping(b:listmode_changetype_backward_normal, g:ListMode_changetype_normal, "n")
-		call listmode#RestoreMapping(b:listmode_changetype_forward_insert, g:ListMode_changetype_insert, "i")
-		call listmode#RestoreMapping(b:listmode_changetype_backward_insert, g:ListMode_changetype_insert, "i")
+		call listmode#RestoreMapping(b:listmode_changetype_forward_normal, g:ListMode_changetype_forward_normal, "n")
+		call listmode#RestoreMapping(b:listmode_changetype_backward_normal, g:ListMode_changetype_backward_normal, "n")
+		call listmode#RestoreMapping(b:listmode_changetype_forward_insert, g:ListMode_changetype_forward_insert, "i")
+		call listmode#RestoreMapping(b:listmode_changetype_backward_insert, g:ListMode_changetype_backward_insert, "i")
         if g:ListMode_remap_oO
             call listmode#RestoreMapping(b:listmode_o_mapping, "o", "n")
             call listmode#RestoreMapping(b:listmode_O_mapping, "O", "n")
@@ -157,8 +155,8 @@ endfunction
 
 function! listmode#FindListType(line) " {{{1
     " Find type of list of current line. ("ol" = ordered list; "ul" = unordered
-    " list; "nl" = numbered lists ("#. "); "el" = special list #2; "dl" = description
-    " list.
+    " list; "nl" = numbered lists ("#. "); "el" = special list #2; "dl" =
+    " description list.)
 	if listmode#IsWhiteSpace(a:line)
 		return "empty"
 	elseif listmode#IsOList(a:line)
@@ -537,12 +535,12 @@ function! listmode#ChangeListType(listRotation) " {{{1
 endfunction
 
 function listmode#ChangeListTypeForward() " {{{1
-	let l:listRotation = {"ol": g:ListMode_unordered_char . " ", "ul": "@. ", "el": "1. ", "nl": "1. ", "empty": "1. "}
+	let l:listRotation = g:ListMode_list_rotation_forward
     call listmode#ChangeListType(l:listRotation)
 endfunction
 
 function listmode#ChangeListTypeBackward() " {{{1
-    let l:listRotation = {"ol": "@. ", "el": g:ListMode_unordered_char . " ", "ul": "1. ", "nl": "1. ", "empty": "1. "}
+    let l:listRotation = g:ListMode_list_rotation_backward
     call listmode#ChangeListType(l:listRotation)
 endfunction
 

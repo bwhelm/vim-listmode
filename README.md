@@ -168,11 +168,21 @@ The following variables can be configured (with defaults given):
   cursor is in the list prefix, a new list item is created above the current
   line. For insert mode.
 
-- **g:ListMode_changetype_normal** = "\<D-8\>". This changes the list type of all 
-  siblings of the current list item. For normal mode.
+- **g:ListMode_changetype_forward_normal**="<D-8>" This changes the list type
+  of all siblings of the current list item. For normal mode. The list of
+  rotations is determined by *g:ListMode_list_rotation_forward*.
 
-- **g:ListMode_changetype_insert** = "\<D-8\>". This changes the list type of all
-  siblings of the current list item. For insert mode.
+- **g:ListMode_changetype_backward_normal**="<D-7>" This changes the list type
+  of all siblings of the current list item. For normal mode. The list of
+  rotations is determined by *g:ListMode_list_rotation_backward*.
+
+- **g:ListMode_changetype_forward_insert**="<D-8>" This changes the list type
+  of all siblings of the current list item. For insert mode. The list of
+  rotations is determined by *g:ListMode_list_rotation_forward*.
+
+- **g:ListMode_changetype_backward_insert**="<D-7>" This changes the list type
+  of all siblings of the current list item. For insert mode. The list of
+  rotations is determined by *g:ListMode_list_rotation_backward*.
 
 - **g:ListMode_separator_mapping** = "<LocalLeader>-". This inserts
   "<!-- --><CR><CR>", only in insert mode.
@@ -190,6 +200,18 @@ The following variables can be configured (with defaults given):
 - **g:ListMode_unordered_char**="-". This defines the default prefix for
   unordered lists. Possible values are "-", "+", and "*".
 
+- **g:ListMode_list_rotation_forward**={"ol": g:ListMode_unordered_char . " ",
+  "ul": "@. ", "el": "#. ", "nl": "1. ", "empty": "1. "} This defines the
+  default rotation of list types in the forward direction, where "ol" =
+  ordered list; "ul" = unordered list; "nl" = numbered lists ("#. "); "el" =
+  special list #2; "dl" = description list.
+
+- **g:ListMode_list_rotation_backward**={"nl": "@. ", "el":
+  g:ListMode_unordered_char . " ", "ul": "1. ", "ol": "#. ", "empty": "1. "}
+  This defines the default rotation of list types in the forward direction,
+  where "ol" = ordered list; "ul" = unordered list; "nl" = numbered lists ("#.
+  "); "el" = special list #2; "dl" = description list.
+
 ## LIMITATIONS
 
 1. ListMode assumes lines are soft wrapped, so that each line contains a single
@@ -200,9 +222,6 @@ The following variables can be configured (with defaults given):
    than "\*" or "+" for unordered lists and "1. " rather than "1) " or "(1) "
    for ordered lists, for example. What style this is is hard-coded. It should
    be a user-defined option.
-
-2. The mappings from one list type to another used when changing list types is
-   hardcoded. This should be a user-defined option.
 
 3. Pandoc definition lists can have multiple definitions, and the term and
    definition can be separated by blank lines. These options are not supported.
