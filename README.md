@@ -13,19 +13,20 @@ in markdown or pandoc.
 ## FUNCTION OF LISTMODE
 
 ListMode will facilitate entering lists by remapping (by default) "\<CR\>",
-"\<Tab\>" and "\<S-Tab\>" to automatically create new list items, indent the
-current list item, or outdent the current list item. In doing this, the list
-prefixes are automatically updated to reflect what the new list item should be.
-Thus, when in an ordered list, hitting "\<CR\>" at the end of a list item will
-create a new list item with the next numbered item already in place. "\<CR\>"
-will also split lines when the cursor is in the middle of a line, and create
-new items above the current line when the cursor is at the beginning of the
-line. If the line is empty (other than the list prefix), hitting "\<CR\>" will
-automatically outdent the item (changing the list type as necessary), or, if
-the line is not indented, remove the list prefix.
+"\>\>" and "\<\<" (or "\<C-t\>" and "\<C-d\>" in insert mode) to automatically
+create new list items, indent the current list item, or outdent the current
+list item. In doing this, the list prefixes are automatically updated to
+reflect what the new list item should be. Thus, when in an ordered list,
+hitting "\<CR\>" at the end of a list item will create a new list item with the
+next numbered item already in place. "\<CR\>" will also split lines when the
+cursor is in the middle of a line, and create new items above the current line
+when the cursor is at the beginning of the line. If the line is empty (other
+than the list prefix), hitting "\<CR\>" will automatically outdent the item
+(changing the list type as necessary), or, if the line is not indented, remove
+the list prefix.
 
-Similarly, hitting "\<Tab\>" or "\<S-Tab\>" will indent or outdent list items,
-changing the list type as appropriate.
+Similarly, hitting "\>\>" or "\<\<" (or "\<C-t\>" or "\<C-d\>" in insert mode)
+will indent or outdent list items, changing the list type as appropriate.
 
 The list type of all siblings of the current item can be changed by typing (by
 default) "\<D-8\>"; parents and children will be unaffected.
@@ -35,9 +36,9 @@ The current list can be reformatted from normal mode by typing (by default)
 
 ListMode is toggled on or off from normal mode by typing (by default)
 "\<Leader\>lm" (for "ListMode"). When ListMode is toggled on, it saves the
-current mappings for "\<CR\>", "\<Tab\>", "\<S-Tab\>", and "\<D-8\>" and remaps
-them to ListMode functions. When it is toggled off, the old mappings are
-restored.
+current mappings for "\<CR\>", "\>\>", "\<\<", "\<C-t\>", "\<C-d\>", and
+"\<D-8\>" and remaps them to ListMode functions. When it is toggled off, the
+old mappings are restored.
 
 ListMode can be configured to remap "o" and "O" to insert list headers as
 appropriate. This option is set through *g:ListMode_remap_oO*.
@@ -84,7 +85,7 @@ or
     2) Item 2
 
 In addition, ordered and unordered lists can be nested by indenting sub-lists
-with either \<Tab\> or 4 spaces:
+with either tab or 4 spaces:
 
     1. Item 1
         - Sub-item 1
@@ -143,16 +144,16 @@ The following variables can be configured (with defaults given):
 - **g:vim_listmode_reformat** = **g:vim_listmode_map_prefix** . "lr". This
   reformats the current list, but only in normal mode.
 
-- **g:ListMode_indent_normal** = "\<Tab\>". This indents the current line, leaving
+- **g:ListMode_indent_normal** = "\>\>". This indents the current line, leaving
   the cursor where it was in the text. Used for normal mode.
 
-- **g:ListMode_indent_insert** = "\<Tab\>". This indents the current line, leaving
+- **g:ListMode_indent_insert** = "\<\<". This indents the current line, leaving
   the cursor where it was in the text. Used for insert mode.
 
-- **g:ListMode_outdent_normal** = "\<S-Tab\>". This outdents the current line,
+- **g:ListMode_outdent_normal** = "\<C-t\>". This outdents the current line,
   leaving the cursor where it was in the text. Used for normal mode.
 
-- **g:ListMode_outdent_insert** = "\<S-Tab\>". This outdents the current line,
+- **g:ListMode_outdent_insert** = "\<C-d\>". This outdents the current line,
   leaving the cursor where it was in the text. Used for insert mode.
 
 - **g:ListMode_newitem_normal** = "\<CR\>". This inserts a new list item at the

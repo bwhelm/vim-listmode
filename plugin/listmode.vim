@@ -30,19 +30,19 @@ if !exists('g:vim_listmode_reformat')
 endif
 
 if !exists('g:ListMode_indent_normal')
-    let g:ListMode_indent_normal = "<Tab>"
+    let g:ListMode_indent_normal = ">>"
 endif
 
 if !exists('g:ListMode_indent_insert')
-    let g:ListMode_indent_insert = "<Tab>"
+    let g:ListMode_indent_insert = "<C-t>"
 endif
 
 if !exists('g:ListMode_outdent_normal')
-    let g:ListMode_outdent_normal = "<S-Tab>"
+    let g:ListMode_outdent_normal = "<<"
 endif
 
 if !exists('g:ListMode_outdent_insert')
-    let g:ListMode_outdent_insert = "<S-Tab>"
+    let g:ListMode_outdent_insert = "<C-d>"
 endif
 
 if !exists('g:ListMode_newitem_normal')
@@ -53,12 +53,20 @@ if !exists('g:ListMode_newitem_insert')
     let g:ListMode_newitem_insert = "<CR>"
 endif
 
-if !exists('g:ListMode_changetype_normal')
-    let g:ListMode_changetype_normal = "<D-8>"
+if !exists('g:ListMode_changetype_forward_normal')
+    let g:ListMode_changetype_forward_normal = "<D-8>"
 endif
 
-if !exists('g:ListMode_changetype_insert')
-    let g:ListMode_changetype_insert = "<D-8>"
+if !exists('g:ListMode_changetype_backward_normal')
+    let g:ListMode_changetype_backward_normal = "<D-7>"
+endif
+
+if !exists('g:ListMode_changetype_forward_insert')
+    let g:ListMode_changetype_forward_insert = "<D-8>"
+endif
+
+if !exists('g:ListMode_changetype_backward_insert')
+    let g:ListMode_changetype_backward_insert = "<D-7>"
 endif
 
 if !exists('g:ListMode_separator')

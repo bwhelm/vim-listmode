@@ -30,8 +30,10 @@ function! listmode#ToggleListMode()
 		call listmode#RestoreMapping(b:listmode_outdent_insert, g:ListMode_outdent_insert, "i")
 		call listmode#RestoreMapping(b:listmode_newitem_normal, g:ListMode_newitem_normal, "n")
 		call listmode#RestoreMapping(b:listmode_newitem_insert, g:ListMode_newitem_insert, "i")
-		call listmode#RestoreMapping(b:listmode_changetype_normal, g:ListMode_changetype_normal, "n")
-		call listmode#RestoreMapping(b:listmode_changetype_insert, g:ListMode_changetype_insert, "i")
+		call listmode#RestoreMapping(b:listmode_changetype_forward_normal, g:ListMode_changetype_normal, "n")
+		call listmode#RestoreMapping(b:listmode_changetype_backward_normal, g:ListMode_changetype_normal, "n")
+		call listmode#RestoreMapping(b:listmode_changetype_forward_insert, g:ListMode_changetype_insert, "i")
+		call listmode#RestoreMapping(b:listmode_changetype_backward_insert, g:ListMode_changetype_insert, "i")
         if g:ListMode_remap_oO
             call listmode#RestoreMapping(b:listmode_o_mapping, "o", "n")
             call listmode#RestoreMapping(b:listmode_O_mapping, "O", "n")
@@ -55,16 +57,20 @@ function! listmode#ToggleListMode()
 		let b:listmode_outdent_insert = maparg(g:ListMode_outdent_insert, "i", 0, 1)
 		let b:listmode_newitem_normal = maparg(g:ListMode_newitem_normal, "n", 0, 1)
 		let b:listmode_newitem_insert = maparg(g:ListMode_newitem_insert, "i", 0, 1)
-		let b:listmode_changetype_normal = maparg(g:ListMode_changetype_normal, "n", 0, 1)
-		let b:listmode_changetype_insert = maparg(g:ListMode_changetype_insert, "i", 0, 1)
+		let b:listmode_changetype_forward_normal = maparg(g:ListMode_changetype_forward_normal, "n", 0, 1)
+		let b:listmode_changetype_backward_normal = maparg(g:ListMode_changetype_backward_normal, "n", 0, 1)
+		let b:listmode_changetype_forward_insert = maparg(g:ListMode_changetype_forward_insert, "i", 0, 1)
+		let b:listmode_changetype_backward_insert = maparg(g:ListMode_changetype_backward_insert, "i", 0, 1)
 		execute "nnoremap <buffer> <silent>" g:ListMode_indent_normal ":call listmode#IndentLine()<CR>"
 		execute "inoremap <buffer> <silent>" g:ListMode_indent_insert "<C-\\><C-o>:call listmode#IndentLine()<CR>"
 		execute "nnoremap <buffer> <silent>" g:ListMode_outdent_normal ":call listmode#OutdentLine()<CR>"
 		execute "inoremap <buffer> <silent>" g:ListMode_outdent_insert "<C-\\><C-o>:call listmode#OutdentLine()<CR>"
 		execute "nnoremap <buffer> <silent>" g:ListMode_newitem_normal ":call listmode#NewListItem()<CR>"
 		execute "inoremap <buffer> <silent>" g:ListMode_newitem_insert "<C-\\><C-o>:call listmode#NewListItem()<CR>"
-		execute "nnoremap <buffer> <silent>" g:ListMode_changetype_normal ":call listmode#ChangeListType()<CR>"
-		execute "inoremap <buffer> <silent>" g:ListMode_changetype_insert "<C-\\><C-o>:call listmode#ChangeListType()<CR>"
+		execute "nnoremap <buffer> <silent>" g:ListMode_changetype_forward_normal ":call listmode#ChangeListTypeForward()<CR>"
+		execute "nnoremap <buffer> <silent>" g:ListMode_changetype_backward_normal ":call listmode#ChangeListTypeBackward()<CR>"
+		execute "inoremap <buffer> <silent>" g:ListMode_changetype_forward_insert "<C-\\><C-o>:call listmode#ChangeListTypeForward()<CR>"
+		execute "inoremap <buffer> <silent>" g:ListMode_changetype_backward_insert "<C-\\><C-o>:call listmode#ChangeListTypeBackward()<CR>"
         if g:ListMode_remap_oO
             let b:listmode_o_mapping = maparg("o", "n", 0, 1)
             let b:listmode_O_mapping = maparg("O", "n", 0, 1)
@@ -403,18 +409,19 @@ endfunction
 function! listmode#IndentLine() " {{{1
     " Indent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
-	if listmode#LineContent(s:line)[0] == ":" && s:line[s:cursorColumn - 2] == ":"
-		" We're at beginning of description list, which contains only a ":"
-		" character, so a <tab> should be interpreted as a <tab> rather than
-		" indenting the line.
-		let l:newLine = s:line[:s:cursorColumn - 2] . "\t" . s:line[s:cursorColumn:]
-		let l:newCursorColumn = s:cursorColumn + 1
-	elseif s:currentListType == "dl"
-		echohl WarningMsg
-		echo "Cannot indent description lists. Hit '>>'."
-		echohl None
-		return
-	else
+	"if listmode#LineContent(s:line)[0] == ":" && s:line[s:cursorColumn - 2] == ":"
+	"	" We're at beginning of description list, which contains only a ":"
+	"	" character, so a <tab> should be interpreted as a <tab> rather than
+	"	" indenting the line.
+	"	let l:newLine = s:line[:s:cursorColumn - 2] . "\t" . s:line[s:cursorColumn:]
+	"	let l:newCursorColumn = s:cursorColumn + 1
+	"elseif s:currentListType == "dl"
+	"	echohl WarningMsg
+	"	echo "Cannot indent description lists. Hit '>>'."
+	"	echohl None
+	"	return
+	"else
+    if 1
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
 		if s:currentListType == "el"
 			let l:prefix .= listmode#FindExampleListKey(s:line)
@@ -435,12 +442,13 @@ endfunction
 function! listmode#OutdentLine() " {{{1
     " Outdent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
-	if s:currentListType == "dl"
-		echohl WarningMsg
-		echo "Cannot outdent description lists. Hit '<<'."
-		echohl None
-		return
-	elseif s:currentLineLevel > 0  " We need to outdent
+	"if s:currentListType == "dl"
+	"	echohl WarningMsg
+	"	echo "Cannot outdent description lists. Hit '<<'."
+	"	echohl None
+	"	return
+	"elseif s:currentLineLevel > 0  " We need to outdent
+	if s:currentLineLevel > 0  " We need to outdent
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) - 1)
 		if s:currentListType == "el"
 			let l:prefix .= listmode#FindExampleListKey(s:line)
@@ -463,13 +471,13 @@ function! listmode#OutdentLine() " {{{1
 	call listmode#ReformatList()
 endfunction
 
-function! listmode#ChangeListType() " {{{1
+function! listmode#ChangeListType(listRotation) " {{{1
     " ChangeListType() will search backwards and forwards in theList to find all
     " siblings of the current line and will change them to a given list type.
     "
-	" l:listRotation specifies how list types rotate: ordered lists become unordered lists; everything else becomes an ordered list.	
+    " a:listRotation specifies how list types rotate: ordered lists become
+    " unordered lists; everything else becomes an ordered list.	
     call listmode#InitializeListFunctions()
-	let l:listRotation = {"ol": g:ListMode_unordered_char . " ", "ul": "@. ", "el": "1. ", "nl": "1. ", "empty": "1. "}
 	if s:listEndLineNumber == 0  " Not a list item...
         let l:thisLine = getline(".")
         if (listmode#LineContent(getline(s:lineNumber)) == "" || listmode#IsList(getline(s:lineNumber))) && (listmode#LineContent(getline(s:lineNumber + 2)) == "" || listmode#IsList(getline(s:lineNumber + 2)))
@@ -491,7 +499,7 @@ function! listmode#ChangeListType() " {{{1
 		echohl None
 		return
 	endif
-	let l:newType = l:listRotation[s:currentListType]
+	let l:newType = a:listRotation[s:currentListType]
 	let l:prefix = repeat("\t", s:currentLineLevel) . l:newType
 	let l:newCursorColumn = listmode#PlaceCursor(s:line, l:prefix, s:cursorColumn)
 	let l:newLine = l:prefix . listmode#LineContent(s:line)
@@ -526,6 +534,16 @@ function! listmode#ChangeListType() " {{{1
 	call setline(s:lineNumber + 1, l:newLine)
 	call setpos(".", [s:bufferNumber, s:lineNumber + 1, l:newCursorColumn, s:cursorOffset])
 	call listmode#ReformatList()
+endfunction
+
+function listmode#ChangeListTypeForward() " {{{1
+	let l:listRotation = {"ol": g:ListMode_unordered_char . " ", "ul": "@. ", "el": "1. ", "nl": "1. ", "empty": "1. "}
+    call listmode#ChangeListType(l:listRotation)
+endfunction
+
+function listmode#ChangeListTypeBackward() " {{{1
+    let l:listRotation = {"ol": "@. ", "el": g:ListMode_unordered_char . " ", "ul": "1. ", "nl": "1. ", "empty": "1. "}
+    call listmode#ChangeListType(l:listRotation)
 endfunction
 
 function! listmode#NewListItem() " {{{1
