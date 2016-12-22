@@ -17,7 +17,12 @@ function! listmode#RestoreMapping(mapDict, key, mode) " Restores mapping saved i
 	endif
 endfunction
 
-function! listmode#ToggleListMode() " Switches between mappings {{{1
+function! listmode#ToggleListMode(...) " Switches between mappings {{{1
+    if a:0
+        let l:showMessages = 0
+    else
+        let l:showMessages = 1
+    endif
     if !exists("b:listmode")
         let b:listmode = 0  " Start with listmode off by default with new buffer
     endif
@@ -45,9 +50,11 @@ function! listmode#ToggleListMode() " Switches between mappings {{{1
 			let &l:foldexpr=b:oldfoldexpr
 			let &l:foldtext=b:oldfoldtext
 		endif
-		echohl Comment
-		echo "Now leaving vim list mode"
-		echohl None
+        if l:showMessages
+            echohl Comment
+            echo "Now leaving vim list mode"
+            echohl None
+        endif
 	else				" Need to save keymappings and generate new ones
 		let b:listmode_indent_normal = maparg(g:ListMode_indent_normal, "n", 0, 1)
 		let b:listmode_indent_insert = maparg(g:ListMode_indent_insert, "i", 0, 1)
@@ -91,10 +98,11 @@ function! listmode#ToggleListMode() " Switches between mappings {{{1
 			setlocal foldexpr=listmode#GetListModeFold(v:lnum)
 			setlocal foldtext=listmode#FoldText()
 		endif
-
-		echohl Comment
-		echo "Now entering vim list mode"
-		echohl None
+        if l:showMessages
+            echohl Comment
+            echo "Now entering vim list mode"
+            echohl None
+        endif
 	endif
 endfunction
 " }}}
