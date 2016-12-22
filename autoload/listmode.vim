@@ -633,12 +633,12 @@ function! listmode#CurrentListItemA() " {{{1
     endif
     normal! 0
     let [a, b, c, d] = getpos(".")
-    let l:startPosition = match(l:thisLine, '\(^\s*\)\@<=\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+]\)\s\+')
+    let l:startPosition = match(l:thisLine, '\(^\s*\)\@<=\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+')
     normal! $
     let l:endPosition = getpos(".")
     if l:startPosition == -1
 		echohl WarningMsg
-        echo "Not an ordered or unordered list item!"
+        echo "Not a list item!"
 		echohl None
         return 0
     else
@@ -653,12 +653,12 @@ function! listmode#CurrentListItemI() " {{{1
     endif
     normal! 0
     let [a, b, c, d] = getpos(".")
-    let l:startPosition = match(l:thisLine, '\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+]\)\s\+\)\@<=\S')
+    let l:startPosition = match(l:thisLine, '\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+\)\@<=\S')
     normal! $
     let l:endPosition = getpos(".")
     if l:startPosition == -1
 		echohl WarningMsg
-        echo "Not an ordered or unordered list item!"
+        echo "Not a list item!"
 		echohl None
         return 0
     else
