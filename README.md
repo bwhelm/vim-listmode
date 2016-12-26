@@ -29,16 +29,17 @@ Similarly, hitting "\>\>" or "\<\<" (or "\<C-t\>" or "\<C-d\>" in insert mode)
 will indent or outdent list items, changing the list type as appropriate.
 
 The list type of all siblings of the current item can be changed by typing (by
-default) "\<D-8\>"; parents and children will be unaffected.
+default) "\<Leader\>[" and "\<Leader\>]"; parents and children will be
+unaffected.
 
 The current list can be reformatted from normal mode by typing (by default)
 "\<Leader\>lr" (for "Listmode Reformat").
 
 ListMode is toggled on or off from normal mode by typing (by default)
 "\<Leader\>lm" (for "ListMode"). When ListMode is toggled on, it saves the
-current mappings for "\<CR\>", "\>\>", "\<\<", "\<C-t\>", "\<C-d\>", and
-"\<D-8\>" and remaps them to ListMode functions. When it is toggled off, the
-old mappings are restored.
+current mappings for "\<CR\>", "\>\>", "\<\<", "\<C-t\>", "\<C-d\>",
+"\<Leader\>[" and "\<Leader\>]" and remaps them to ListMode functions. When it
+is toggled off, the old mappings are restored.
 
 ListMode can be configured to remap "o" and "O" to insert list headers as
 appropriate. This option is set through *g:ListMode_remap_oO*.
@@ -168,21 +169,21 @@ The following variables can be configured (with defaults given):
   cursor is in the list prefix, a new list item is created above the current
   line. For insert mode.
 
-- **g:ListMode_changetype_forward_normal**="<D-8>" This changes the list type
-  of all siblings of the current list item. For normal mode. The list of
-  rotations is determined by *g:ListMode_list_rotation_forward*.
+- **g:ListMode_changetype_backward_normal**="<Leader>[ This changes the list
+type of all siblings of the current list item. For normal mode. The list of
+rotations is determined by *g:ListMode_list_rotation_backward*.
 
-- **g:ListMode_changetype_backward_normal**="<D-7>" This changes the list type
-  of all siblings of the current list item. For normal mode. The list of
-  rotations is determined by *g:ListMode_list_rotation_backward*.
+- **g:ListMode_changetype_forward_normal**="<Leader>]" This changes the list
+type of all siblings of the current list item. For normal mode. The list of
+rotations is determined by *g:ListMode_list_rotation_forward*.
 
-- **g:ListMode_changetype_forward_insert**="<D-8>" This changes the list type
-  of all siblings of the current list item. For insert mode. The list of
-  rotations is determined by *g:ListMode_list_rotation_forward*.
+- **g:ListMode_changetype_backward_insert**="<Leader>[" This changes the list
+type of all siblings of the current list item. For insert mode. The list of
+rotations is determined by *g:ListMode_list_rotation_backward*.
 
-- **g:ListMode_changetype_backward_insert**="<D-7>" This changes the list type
-  of all siblings of the current list item. For insert mode. The list of
-  rotations is determined by *g:ListMode_list_rotation_backward*.
+- **g:ListMode_changetype_forward_insert**="<Leader>]" This changes the list
+type of all siblings of the current list item. For insert mode. The list of
+rotations is determined by *g:ListMode_list_rotation_forward*.
 
 - **g:ListMode_separator_mapping** = "<LocalLeader>-". This inserts
   "<!-- --><CR><CR>", only in insert mode.

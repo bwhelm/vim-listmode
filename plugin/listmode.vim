@@ -53,20 +53,20 @@ if !exists('g:ListMode_newitem_insert')
     let g:ListMode_newitem_insert = "<CR>"
 endif
 
-if !exists('g:ListMode_changetype_forward_normal')
-    let g:ListMode_changetype_forward_normal = "<D-8>"
-endif
-
 if !exists('g:ListMode_changetype_backward_normal')
-    let g:ListMode_changetype_backward_normal = "<D-7>"
+    let g:ListMode_changetype_backward_normal = g:vim_listmode_map_prefix . "["
 endif
 
-if !exists('g:ListMode_changetype_forward_insert')
-    let g:ListMode_changetype_forward_insert = "<D-8>"
+if !exists('g:ListMode_changetype_forward_normal')
+    let g:ListMode_changetype_forward_normal = g:vim_listmode_map_prefix . "]"
 endif
 
 if !exists('g:ListMode_changetype_backward_insert')
-    let g:ListMode_changetype_backward_insert = "<D-7>"
+    let g:ListMode_changetype_backward_insert = g:vim_listmode_map_prefix . "["
+endif
+
+if !exists('g:ListMode_changetype_forward_insert')
+    let g:ListMode_changetype_forward_insert = g:vim_listmode_map_prefix . "]"
 endif
 
 if !exists('g:ListMode_separator')
