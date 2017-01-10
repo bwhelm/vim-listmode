@@ -343,8 +343,8 @@ function! listmode#ReformatList() " {{{1
 	endfor
     let l:listSeparatorFlag = 0
 	let l:previousLevel = -1
-	let l:newList = []
     let l:newCursorColumn = s:cursorColumn
+	let l:newList = []
 	for l:key in range(s:listBeginLineNumber, s:listEndLineNumber)
 		let [l:listType, l:listLevel] = s:listStructure[l:key]
 		" If l:listType == "empty", I want to leave it alone, so that gets
@@ -405,10 +405,17 @@ function! listmode#ReformatList() " {{{1
 			if l:key == s:lineNumber
 				let l:newCursorColumn = listmode#PlaceCursor(s:bufferText[l:key], l:newItemPrefix, s:cursorColumn)
 			endif
-			call setline(l:key + 1, l:newLine)
+            " Next line takes way too much time! Instead, store everything in
+            " a list and change in the buffer once at the end
+			" call setline(l:key + 1, l:newLine)
+            call add(l:newList, l:newLine)
 			let l:previousLevel = l:listLevel
+        else
+            " let l:itemText = listmode#LineContent(s:bufferText[l:key])
+            call add(l:newList, s:bufferText[l:key])
 		endif
 	endfor
+    call setline(s:listBeginLineNumber + 1, l:newList)
 	call setpos('.', [s:bufferNumber, s:lineNumber + 1, l:newCursorColumn, s:cursorOffset])
 endfunction
 
