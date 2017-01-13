@@ -17,6 +17,87 @@ function! listmode#RestoreMapping(mapDict, key, mode) " Restores mapping saved i
 	endif
 endfunction
 
+function! listmode#ListModeOn(showMessages)  " Turn listmode on -- set all mappings {{{1
+    let b:listmode_indent_normal = maparg(g:ListMode_indent_normal, 'n', 0, 1)
+    let b:listmode_indent_insert = maparg(g:ListMode_indent_insert, 'i', 0, 1)
+    let b:listmode_outdent_normal = maparg(g:ListMode_outdent_normal, 'n', 0, 1)
+    let b:listmode_outdent_insert = maparg(g:ListMode_outdent_insert, 'i', 0, 1)
+    let b:listmode_newitem_normal = maparg(g:ListMode_newitem_normal, 'n', 0, 1)
+    let b:listmode_newitem_insert = maparg(g:ListMode_newitem_insert, 'i', 0, 1)
+    let b:listmode_changetype_forward_normal = maparg(g:ListMode_changetype_forward_normal, 'n', 0, 1)
+    let b:listmode_changetype_backward_normal = maparg(g:ListMode_changetype_backward_normal, 'n', 0, 1)
+    let b:listmode_changetype_forward_insert = maparg(g:ListMode_changetype_forward_insert, 'i', 0, 1)
+    let b:listmode_changetype_backward_insert = maparg(g:ListMode_changetype_backward_insert, 'i', 0, 1)
+    execute 'nnoremap <buffer> <silent>' g:ListMode_indent_normal ':call listmode#IndentLine()<CR>'
+    execute 'inoremap <buffer> <silent>' g:ListMode_indent_insert "<C-\\><C-o>:call listmode#IndentLine()<CR>"
+    execute 'nnoremap <buffer> <silent>' g:ListMode_outdent_normal ':call listmode#OutdentLine()<CR>'
+    execute 'inoremap <buffer> <silent>' g:ListMode_outdent_insert "<C-\\><C-o>:call listmode#OutdentLine()<CR>"
+    execute 'nnoremap <buffer> <silent>' g:ListMode_newitem_normal ':call listmode#NewListItem()<CR>'
+    execute 'inoremap <buffer> <silent>' g:ListMode_newitem_insert "<C-\\><C-o>:call listmode#NewListItem()<CR>"
+    execute 'nnoremap <buffer> <silent>' g:ListMode_changetype_forward_normal ':call listmode#ChangeListTypeForward()<CR>'
+    execute 'nnoremap <buffer> <silent>' g:ListMode_changetype_backward_normal ':call listmode#ChangeListTypeBackward()<CR>'
+    execute 'inoremap <buffer> <silent>' g:ListMode_changetype_forward_insert "<C-\\><C-o>:call listmode#ChangeListTypeForward()<CR>"
+    execute 'inoremap <buffer> <silent>' g:ListMode_changetype_backward_insert "<C-\\><C-o>:call listmode#ChangeListTypeBackward()<CR>"
+    if g:ListMode_remap_oO
+        let b:listmode_o_mapping = maparg('o', 'n', 0, 1)
+        let b:listmode_O_mapping = maparg('O', 'n', 0, 1)
+        " Note: We want these to involve ListMode's <CR>, so shouldn't use
+        " nnoremap`.
+        nmap <buffer> o A<CR>
+        nmap <buffer> O I<CR>
+    endif
+    let b:listmode_separator_mapping = maparg(g:ListMode_separator, 'i', 0, 1)
+    execute 'inoremap <buffer> <silent>' g:ListMode_separator '<!-- --><CR><CR>'
+
+    let b:listmode = 1
+
+    " Set up folding for later restore
+    if g:ListMode_folding != 0
+        let b:oldfoldmethod=&foldmethod
+        let b:oldfoldexpr=&foldexpr
+        let b:oldfoldtext=&foldtext
+        setlocal foldmethod=expr
+        setlocal foldexpr=listmode#GetListModeFold(v:lnum)
+        setlocal foldtext=listmode#FoldText()
+    endif
+    if a:showMessages
+        echohl Comment
+        echo 'Now entering vim list mode'
+        echohl None
+    endif
+endfunction
+
+function! listmode#ListModeOff(showMessages)  " Turn listmode off and restore mappings {{{1
+    call listmode#RestoreMapping(b:listmode_indent_normal, g:ListMode_indent_normal, 'n')
+    call listmode#RestoreMapping(b:listmode_indent_insert, g:ListMode_indent_insert, 'i')
+    call listmode#RestoreMapping(b:listmode_outdent_normal, g:ListMode_outdent_normal, 'n')
+    call listmode#RestoreMapping(b:listmode_outdent_insert, g:ListMode_outdent_insert, 'i')
+    call listmode#RestoreMapping(b:listmode_newitem_normal, g:ListMode_newitem_normal, 'n')
+    call listmode#RestoreMapping(b:listmode_newitem_insert, g:ListMode_newitem_insert, 'i')
+    call listmode#RestoreMapping(b:listmode_changetype_forward_normal, g:ListMode_changetype_forward_normal, 'n')
+    call listmode#RestoreMapping(b:listmode_changetype_backward_normal, g:ListMode_changetype_backward_normal, 'n')
+    call listmode#RestoreMapping(b:listmode_changetype_forward_insert, g:ListMode_changetype_forward_insert, 'i')
+    call listmode#RestoreMapping(b:listmode_changetype_backward_insert, g:ListMode_changetype_backward_insert, 'i')
+    if g:ListMode_remap_oO
+        call listmode#RestoreMapping(b:listmode_o_mapping, 'o', 'n')
+        call listmode#RestoreMapping(b:listmode_O_mapping, 'O', 'n')
+    endif
+    call listmode#RestoreMapping(b:listmode_separator_mapping, g:ListMode_separator, 'i')
+    let b:listmode=0
+
+    " Restore folding
+    if g:ListMode_folding != 0
+        let &l:foldmethod=b:oldfoldmethod
+        let &l:foldexpr=b:oldfoldexpr
+        let &l:foldtext=b:oldfoldtext
+    endif
+    if a:showMessages
+        echohl Comment
+        echo 'Now leaving vim list mode'
+        echohl None
+    endif
+endfunction
+
 function! listmode#ToggleListMode(...) " Switches between mappings {{{1
     if a:0
         let l:showMessages = 0
@@ -27,82 +108,9 @@ function! listmode#ToggleListMode(...) " Switches between mappings {{{1
         let b:listmode = 0  " Start with listmode off by default with new buffer
     endif
 	if b:listmode		" Need to swap keymappings back
-		call listmode#RestoreMapping(b:listmode_indent_normal, g:ListMode_indent_normal, 'n')
-		call listmode#RestoreMapping(b:listmode_indent_insert, g:ListMode_indent_insert, 'i')
-		call listmode#RestoreMapping(b:listmode_outdent_normal, g:ListMode_outdent_normal, 'n')
-		call listmode#RestoreMapping(b:listmode_outdent_insert, g:ListMode_outdent_insert, 'i')
-		call listmode#RestoreMapping(b:listmode_newitem_normal, g:ListMode_newitem_normal, 'n')
-		call listmode#RestoreMapping(b:listmode_newitem_insert, g:ListMode_newitem_insert, 'i')
-		call listmode#RestoreMapping(b:listmode_changetype_forward_normal, g:ListMode_changetype_forward_normal, 'n')
-		call listmode#RestoreMapping(b:listmode_changetype_backward_normal, g:ListMode_changetype_backward_normal, 'n')
-		call listmode#RestoreMapping(b:listmode_changetype_forward_insert, g:ListMode_changetype_forward_insert, 'i')
-		call listmode#RestoreMapping(b:listmode_changetype_backward_insert, g:ListMode_changetype_backward_insert, 'i')
-        if g:ListMode_remap_oO
-            call listmode#RestoreMapping(b:listmode_o_mapping, 'o', 'n')
-            call listmode#RestoreMapping(b:listmode_O_mapping, 'O', 'n')
-        endif
-        call listmode#RestoreMapping(b:listmode_separator_mapping, g:ListMode_separator, 'i')
-		let b:listmode=0
-
-		" Restore folding
-		if g:ListMode_folding != 0
-			let &l:foldmethod=b:oldfoldmethod
-			let &l:foldexpr=b:oldfoldexpr
-			let &l:foldtext=b:oldfoldtext
-		endif
-        if l:showMessages
-            echohl Comment
-            echo 'Now leaving vim list mode'
-            echohl None
-        endif
+        call listmode#ListModeOff(l:showMessages)
 	else				" Need to save keymappings and generate new ones
-		let b:listmode_indent_normal = maparg(g:ListMode_indent_normal, 'n', 0, 1)
-		let b:listmode_indent_insert = maparg(g:ListMode_indent_insert, 'i', 0, 1)
-		let b:listmode_outdent_normal = maparg(g:ListMode_outdent_normal, 'n', 0, 1)
-		let b:listmode_outdent_insert = maparg(g:ListMode_outdent_insert, 'i', 0, 1)
-		let b:listmode_newitem_normal = maparg(g:ListMode_newitem_normal, 'n', 0, 1)
-		let b:listmode_newitem_insert = maparg(g:ListMode_newitem_insert, 'i', 0, 1)
-		let b:listmode_changetype_forward_normal = maparg(g:ListMode_changetype_forward_normal, 'n', 0, 1)
-		let b:listmode_changetype_backward_normal = maparg(g:ListMode_changetype_backward_normal, 'n', 0, 1)
-		let b:listmode_changetype_forward_insert = maparg(g:ListMode_changetype_forward_insert, 'i', 0, 1)
-		let b:listmode_changetype_backward_insert = maparg(g:ListMode_changetype_backward_insert, 'i', 0, 1)
-		execute 'nnoremap <buffer> <silent>' g:ListMode_indent_normal ':call listmode#IndentLine()<CR>'
-		execute 'inoremap <buffer> <silent>' g:ListMode_indent_insert "<C-\\><C-o>:call listmode#IndentLine()<CR>"
-		execute 'nnoremap <buffer> <silent>' g:ListMode_outdent_normal ':call listmode#OutdentLine()<CR>'
-		execute 'inoremap <buffer> <silent>' g:ListMode_outdent_insert "<C-\\><C-o>:call listmode#OutdentLine()<CR>"
-		execute 'nnoremap <buffer> <silent>' g:ListMode_newitem_normal ':call listmode#NewListItem()<CR>'
-		execute 'inoremap <buffer> <silent>' g:ListMode_newitem_insert "<C-\\><C-o>:call listmode#NewListItem()<CR>"
-		execute 'nnoremap <buffer> <silent>' g:ListMode_changetype_forward_normal ':call listmode#ChangeListTypeForward()<CR>'
-		execute 'nnoremap <buffer> <silent>' g:ListMode_changetype_backward_normal ':call listmode#ChangeListTypeBackward()<CR>'
-		execute 'inoremap <buffer> <silent>' g:ListMode_changetype_forward_insert "<C-\\><C-o>:call listmode#ChangeListTypeForward()<CR>"
-		execute 'inoremap <buffer> <silent>' g:ListMode_changetype_backward_insert "<C-\\><C-o>:call listmode#ChangeListTypeBackward()<CR>"
-        if g:ListMode_remap_oO
-            let b:listmode_o_mapping = maparg('o', 'n', 0, 1)
-            let b:listmode_O_mapping = maparg('O', 'n', 0, 1)
-            " Note: We want these to involve ListMode's <CR>, so shouldn't use
-            " nnoremap`.
-            nmap <buffer> o A<CR>
-            nmap <buffer> O I<CR>
-        endif
-        let b:listmode_separator_mapping = maparg(g:ListMode_separator, 'i', 0, 1)
-        execute 'inoremap <buffer> <silent>' g:ListMode_separator '<!-- --><CR><CR>'
-
-		let b:listmode = 1
-
-		" Set up folding for later restore
-		if g:ListMode_folding != 0
-			let b:oldfoldmethod=&foldmethod
-			let b:oldfoldexpr=&foldexpr
-			let b:oldfoldtext=&foldtext
-			setlocal foldmethod=expr
-			setlocal foldexpr=listmode#GetListModeFold(v:lnum)
-			setlocal foldtext=listmode#FoldText()
-		endif
-        if l:showMessages
-            echohl Comment
-            echo 'Now entering vim list mode'
-            echohl None
-        endif
+        call listmode#ListModeOn(l:showMessages)
 	endif
 endfunction
 " }}}
