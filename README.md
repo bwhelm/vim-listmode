@@ -35,6 +35,12 @@ unaffected.
 The current list can be reformatted from normal mode by typing (by default)
 "\<Leader\>lr" (for "Listmode Reformat").
 
+With ListMode on, typing (by default) "\_" in normal mode will move the cursor
+to the first text character of the current list item. If the cursor is already
+in that position, or if the current line is not a list item, it will behave
+like standard "\_" and move the cursor to the first non-blank character in the
+line. The mapping for this is set through *g:ListMode_go_to_start_of_line*.
+
 ListMode is toggled on or off from normal mode by typing (by default)
 "\<Leader\>lm" (for "ListMode"). When ListMode is toggled on, it saves the
 current mappings for "\<CR\>", "\>\>", "\<\<", "\<C-t\>", "\<C-d\>",
@@ -187,6 +193,9 @@ rotations is determined by *g:ListMode_list_rotation_forward*.
 
 - **g:ListMode_separator_mapping** = "<LocalLeader>-". This inserts
   "<!-- --><CR><CR>", only in insert mode.
+
+- **g:ListMode_go_to_start_of_line="\_"** This defines the default keymapping
+  for moving to the start of the current list item.
 
 - **g:ListMode_remap_oO**=1. This determines whether invoking ListMode remaps
   "o" and "O" to insert lines below or above the current line with the

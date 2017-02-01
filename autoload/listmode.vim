@@ -28,6 +28,7 @@ function! listmode#ListModeOn(showMessages)  " Turn listmode on -- set all mappi
     let b:listmode_changetype_backward_normal = maparg(g:ListMode_changetype_backward_normal, 'n', 0, 1)
     let b:listmode_changetype_forward_insert = maparg(g:ListMode_changetype_forward_insert, 'i', 0, 1)
     let b:listmode_changetype_backward_insert = maparg(g:ListMode_changetype_backward_insert, 'i', 0, 1)
+    let b:listmode_go_to_start_of_line = maparg(g:ListMode_go_to_start_of_line, 'n', 0, 1)
     execute 'nnoremap <buffer> <silent>' g:ListMode_indent_normal ':call listmode#IndentLine()<CR>'
     execute 'inoremap <buffer> <silent>' g:ListMode_indent_insert "<C-\\><C-o>:call listmode#IndentLine()<CR>"
     execute 'nnoremap <buffer> <silent>' g:ListMode_outdent_normal ':call listmode#OutdentLine()<CR>'
@@ -38,6 +39,7 @@ function! listmode#ListModeOn(showMessages)  " Turn listmode on -- set all mappi
     execute 'nnoremap <buffer> <silent>' g:ListMode_changetype_backward_normal ':call listmode#ChangeListTypeBackward()<CR>'
     execute 'inoremap <buffer> <silent>' g:ListMode_changetype_forward_insert "<C-\\><C-o>:call listmode#ChangeListTypeForward()<CR>"
     execute 'inoremap <buffer> <silent>' g:ListMode_changetype_backward_insert "<C-\\><C-o>:call listmode#ChangeListTypeBackward()<CR>"
+    execute 'nnoremap <buffer> <silent>' g:ListMode_go_to_start_of_line ':call listmode#GoToStartOfListItem()<CR>'
     if g:ListMode_remap_oO
         let b:listmode_o_mapping = maparg('o', 'n', 0, 1)
         let b:listmode_O_mapping = maparg('O', 'n', 0, 1)
@@ -78,6 +80,7 @@ function! listmode#ListModeOff(showMessages)  " Turn listmode off and restore ma
     call listmode#RestoreMapping(b:listmode_changetype_backward_normal, g:ListMode_changetype_backward_normal, 'n')
     call listmode#RestoreMapping(b:listmode_changetype_forward_insert, g:ListMode_changetype_forward_insert, 'i')
     call listmode#RestoreMapping(b:listmode_changetype_backward_insert, g:ListMode_changetype_backward_insert, 'i')
+    call listmode#RestoreMapping(b:listmode_go_to_start_of_line, g:ListMode_go_to_start_of_line, 'n')
     if g:ListMode_remap_oO
         call listmode#RestoreMapping(b:listmode_o_mapping, 'o', 'n')
         call listmode#RestoreMapping(b:listmode_O_mapping, 'O', 'n')
@@ -557,12 +560,12 @@ function! listmode#ChangeListType(listRotation) " {{{1
 	call listmode#ReformatList()
 endfunction
 
-function listmode#ChangeListTypeForward() " {{{1
+function! listmode#ChangeListTypeForward() " {{{1
 	let l:listRotation = g:ListMode_list_rotation_forward
     call listmode#ChangeListType(l:listRotation)
 endfunction
 
-function listmode#ChangeListTypeBackward() " {{{1
+function! listmode#ChangeListTypeBackward() " {{{1
     let l:listRotation = g:ListMode_list_rotation_backward
     call listmode#ChangeListType(l:listRotation)
 endfunction
@@ -636,6 +639,23 @@ function! listmode#NewListItem() " {{{1
 	call listmode#ReformatList()
 endfunction
 " }}}
+function! listmode#GoToStartOfListItem()  " {{{1
+    let l:thisLine = getline('.')
+    if empty(l:thisLine)
+        return
+    endif
+    let [l:a, l:b, l:c, l:d] = getpos('.')
+    " Find position of first character of list text
+    let l:startPosition = match(l:thisLine, '\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+\)\@<=\S') + 1
+    if l:startPosition == 0 || l:c == l:startPosition
+        " if we're not in a list, or we're already at start of list, go to
+        " first non-blank character in line
+        normal! _
+    else
+        call setpos('.', [l:a, l:b, l:startPosition, l:d])
+    endif
+endfunction
+"}}}
 
 " =============================================================================
 " Functions defining list text object

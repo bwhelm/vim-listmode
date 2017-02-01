@@ -34,14 +34,20 @@ default) "<Leader>[" and  "<Leader>]"; parents and children will be unaffected.
 The current list can be reformatted from normal mode by typing (by default)
 "<Leader>lr" (for "Listmode Reformat").
 
+With ListMode on, typing (by default) "_" in normal mode will move the cursor
+to the first text character of the current list item. If the cursor is already
+in that position, or if the current line is not a list item, it will behave
+like standard "_" and move the cursor to the first non-blank character in the
+line. The mapping for this is set through |g:ListMode_go_to_start_of_line|.
+
 ListMode is toggled on or off from normal mode by typing (by default)
 "<Leader>lm" (for "ListMode"). When ListMode is toggled on, it saves the
 current mappings for "<CR>", ">>", "<<", "<C-t>", "<C-d>", "<Leader>[" and
 "<Leader>]" and remaps them to ListMode functions. When it is toggled off, the
 old mappings are restored.
 
-ListMode can be configured to remap "o" and "O" to insert list headers as
-appropriate. This option is set through |g:ListMode_remap_oO|.
+ListMode can be configured to remap "o" and "O" (in normal mode) to insert list
+headers as appropriate. This option is set through |g:ListMode_remap_oO|.
 
 Toggling ListMode on optionally changes the folds in a document. This option is
 set through |g:ListMode_folding|.
@@ -198,6 +204,10 @@ mode. The list of rotations is determined by
 
 |g:ListMode_separator_mapping|="<LocalLeader>-"  *g:ListMode_separator_mapping*
 This inserts "<!-- --><CR><CR>", only in insert mode.
+
+|g:ListMode_go_to_start_of_line|="_"           *g:ListMode_go_to_start_of_line*
+This defines the default keymapping for moving to the start of the current list
+item.
 
 |g:ListMode_remap_oO|=1                                   *g:ListMode_remap_oO*
 This determines whether invoking ListMode remaps "o" and "O" to insert lines
