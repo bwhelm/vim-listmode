@@ -652,7 +652,7 @@ function! listmode#GoToStartOfListItem()  " {{{1
         " first non-blank character in line
         normal! _
     else
-        call setpos('.', [l:a, l:b, l:startPosition, l:d])
+        call setpos('.', [l:a, l:b, l:startPosition, l:d, l:startPosition])
     endif
 endfunction
 "}}}
