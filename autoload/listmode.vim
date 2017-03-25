@@ -164,6 +164,12 @@ function! listmode#IsListSeparator(line) "{{{1
     return a:line =~# '^\s*<!-- -->\s*$'
 endfunction
 
+function! listmode#IsIndentedText(line) "{{{1
+    " Check if line is indented text -- not a list, but not something that
+    " breaks a list, either.
+    return a:line =~# '^\(\t\|    \)'
+endfunction
+
 function! listmode#FindLevel(line) " {{{1
     " Find indentation level of line
 	let l:nonSpaceIndex = match(a:line, '\S')
@@ -175,7 +181,7 @@ endfunction
 function! listmode#FindListType(line) " {{{1
     " Find type of list of current line. ("ol" = ordered list; "ul" = unordered
     " list; "nl" = numbered lists ("#. "); "el" = special list #2; "dl" =
-    " description list.)
+    " description list; "te" = text in list.)
 	if listmode#IsWhiteSpace(a:line)
 		return 'empty'
 	elseif listmode#IsOList(a:line)
@@ -190,6 +196,8 @@ function! listmode#FindListType(line) " {{{1
         return 'ls'
     elseif a:line =~# '^\s*[~:]\s'
 		return 'dl'
+    elseif listmode#IsIndentedText(a:line)
+        return 'te'
 	else
 		return 0  " If we know it's a list item, this will be a "dl"
 	endif
@@ -197,7 +205,7 @@ endfunction
 
 function! listmode#IsList(line) " {{{1
     let l:listType = listmode#FindListType(a:line)
-    return l:listType !=# '0' && l:listType !=? 'empty'
+    return l:listType !=# '0' && l:listType !=# 'empty' && l:listType ~=# 'te'
 endfunction
 
 function! listmode#LineContent(line) " {{{1
@@ -336,7 +344,7 @@ function! listmode#InitializeListFunctions() "{{{1
         let s:currentListNumbering = 0
     endif
     " To convert from listType to the needed (pandoc) markdown
-    let s:listDef = {'ol': '1. ', 'ul': g:ListMode_unordered_char . ' ', 'nl': '#. ', 'el': '@. ', 'empty': '', 'dl': '', 'nolist': '', 'ls': ''} 
+    let s:listDef = {'ol': '1. ', 'ul': g:ListMode_unordered_char . ' ', 'nl': '#. ', 'el': '@. ', 'empty': '', 'dl': '', 'nolist': '', 'ls': '', 'te': ''} 
 endfunction
 
 function! listmode#ReformatList() " {{{1
@@ -360,7 +368,7 @@ function! listmode#ReformatList() " {{{1
 		let [l:listType, l:listLevel] = s:listStructure[l:key]
 		" If l:listType == "empty", I want to leave it alone, so that gets
 		" skipped in next conditional.
-		if index(['ul', 'ol', 'nl', 'el', 'dl', 'ls'], l:listType) >= 0
+		if index(['ul', 'ol', 'nl', 'el', 'dl', 'ls', 'te'], l:listType) >= 0
 			let [l:LRType, l:LRNumber] = l:levelRecord[l:listLevel]
 			if l:listLevel > l:previousLevel  " Beginning of sublist
 				if l:listType ==# 'ol'
@@ -602,9 +610,7 @@ function! listmode#NewListItem() " {{{1
             call listmode#ReformatList()
             return
         else
-            call append(s:lineNumber + 1, s:line)
-            call setpos('.', [s:bufferNumber, s:lineNumber + 2, s:cursorColumn + 1, s:cursorOffset])
-            call listmode#ReformatList()
+            call listmode#OutdentLine()
             return
         endif
     elseif listmode#IsWhiteSpace(l:lineContent) && s:currentListType !=# 'nolist'

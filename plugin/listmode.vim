@@ -57,11 +57,11 @@ endif
 
 " Rotation order. ("ol" = ordered list; "ul" = unordered list; "nl" =
 " numbered lists ("#. "); "el" = special list #2; "dl" = description
-" list.)
+" list; "te" = text in list.)
 let g:ListMode_list_rotation_forward = get(g:, 'ListMode_list_rotation_forward',
-    \ {'ol': g:ListMode_unordered_char . ' ', 'ul': '@. ', 'el': '#. ', 'nl': '1. ', 'empty': '1. '})
+    \ {'ol': g:ListMode_unordered_char . ' ', 'ul': '@. ', 'el': '#. ', 'nl': '1. ', 'empty': '1. ', 'te': '1. '})
 let g:ListMode_list_rotation_backward = get(g:, 'ListMode_list_rotation_backward',
-    \{'nl': '@. ', 'el': g:ListMode_unordered_char . ' ', 'ul': '1. ', 'ol': '#. ', 'empty': '1. '})
+    \{'nl': '@. ', 'el': g:ListMode_unordered_char . ' ', 'ul': '1. ', 'ol': '#. ', 'empty': '1. ', 'te': '1. '})
 " }}}
 
 " =============================================================================
