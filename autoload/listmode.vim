@@ -230,17 +230,14 @@ function! listmode#FindListScope() " {{{1
 	let l:listType = listmode#FindListType(s:bufferText[l:lineNumber])
 	let l:begin = 0  " Catches case when cursor starts at beginning of file, which is also beginning of list
 	let l:end = len(s:bufferText) - 1  " Catches case in which cursor starts at end of file, which is also end of list
-	if empty(l:listType) || l:listType ==# 'dl'
+    if l:listType ==# 'dl'
+        let l:lineNumber -= 1  " At second line of DL; go back one line.
+    elseif empty(l:listType)
 		if listmode#IsDescList(s:bufferText[l:lineNumber - 1:l:lineNumber + 2])
 			let l:listType = 'dl'
-		else
-			let l:listType = 0
 		endif
 	endif
 	if !empty(l:listType)  " If current line is empty or a list line...
-		if l:listType ==# 'dl' && match(s:bufferText[l:lineNumber], '^\s*[:~]\s') >= 0  " second line of DL
-			let l:lineNumber -= 1  " Go back one line to start of DL
-		endif
 		" Search backwards
 		let l:lineIndex = l:lineNumber
 		" l:listStructure is a dictionary of lists: {lineno: [listType, listLevel]}
