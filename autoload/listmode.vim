@@ -438,31 +438,17 @@ endfunction
 function! listmode#IndentLine() " {{{1
     " Indent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
-	"if listmode#LineContent(s:line)[0] == ":" && s:line[s:cursorColumn - 2] == ":"
-	"	" We're at beginning of description list, which contains only a ":"
-	"	" character, so a <tab> should be interpreted as a <tab> rather than
-	"	" indenting the line.
-	"	let l:newLine = s:line[:s:cursorColumn - 2] . "\t" . s:line[s:cursorColumn:]
-	"	let l:newCursorColumn = s:cursorColumn + 1
-	"elseif s:currentListType == "dl"
-	"	echohl WarningMsg
-	"	echo "Cannot indent description lists. Hit '>>'."
-	"	echohl None
-	"	return
-	"else
-    if 1
-		let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
-		if s:currentListType ==# 'el'
-			let l:prefix .= listmode#FindExampleListKey(s:line)
-		else
-			let l:prefix .= s:listDef[s:currentListType]
-		endif
-        let l:newLine = l:prefix
-        if match(s:line, '\S') >= 0
-            let l:newLine .= listmode#LineContent(s:line)
-        endif
-		let l:newCursorColumn = listmode#PlaceCursor(s:line, l:prefix, s:cursorColumn)
-	endif
+    let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
+    if s:currentListType ==# 'el'
+        let l:prefix .= listmode#FindExampleListKey(s:line)
+    else
+        let l:prefix .= s:listDef[s:currentListType]
+    endif
+    let l:newLine = l:prefix
+    if match(s:line, '\S') >= 0
+        let l:newLine .= listmode#LineContent(s:line)
+    endif
+    let l:newCursorColumn = listmode#PlaceCursor(s:line, l:prefix, s:cursorColumn)
 	call setline(s:lineNumber + 1, l:newLine)
 	call setpos('.', [s:bufferNumber, s:lineNumber + 1, l:newCursorColumn, s:cursorOffset])
 	call listmode#ReformatList()
@@ -471,12 +457,6 @@ endfunction
 function! listmode#OutdentLine() " {{{1
     " Outdent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
-	"if s:currentListType == "dl"
-	"	echohl WarningMsg
-	"	echo "Cannot outdent description lists. Hit '<<'."
-	"	echohl None
-	"	return
-	"elseif s:currentLineLevel > 0  " We need to outdent
 	if s:currentLineLevel > 0  " We need to outdent
 		let l:prefix = repeat("\t", listmode#FindLevel(s:line) - 1)
 		if s:currentListType ==# 'el'
