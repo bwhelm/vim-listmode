@@ -4,10 +4,11 @@
 " Cope with mappings
 " =============================================================================
 
-function! listmode#RestoreMapping(mapDict, key, mode) " Restores mapping saved in mapDict {{{1
+function! listmode#RestoreMapping(mapDict, key, mode) abort  "{{{1
+    " Restores mapping saved in mapDict
 	execute a:mode . 'unmap <buffer> ' . a:key
 	if !empty(a:mapDict)
-		exe (a:mapDict.noremap ? a:mapDict.mode . 'noremap' : a:mapDict.mode .'map') .
+		execute (a:mapDict.noremap ? a:mapDict.mode . 'noremap' : a:mapDict.mode .'map') .
 			\ (a:mapDict.buffer ? ' <buffer>' : '') .
 			\ (a:mapDict.expr ? ' <expr>' : '') .
 			\ (a:mapDict.nowait ? ' <nowait>' : '') .
@@ -17,7 +18,8 @@ function! listmode#RestoreMapping(mapDict, key, mode) " Restores mapping saved i
 	endif
 endfunction
 
-function! listmode#ListModeOn(showMessages)  " Turn listmode on -- set all mappings {{{1
+function! listmode#ListModeOn(showMessages) abort  "{{{1
+    " Turn listmode on -- set all mappings
     let b:listmode_indent_normal = maparg(g:ListMode_indent_normal, 'n', 0, 1)
     let b:listmode_indent_insert = maparg(g:ListMode_indent_insert, 'i', 0, 1)
     let b:listmode_outdent_normal = maparg(g:ListMode_outdent_normal, 'n', 0, 1)
@@ -69,7 +71,8 @@ function! listmode#ListModeOn(showMessages)  " Turn listmode on -- set all mappi
     endif
 endfunction
 
-function! listmode#ListModeOff(showMessages)  " Turn listmode off and restore mappings {{{1
+function! listmode#ListModeOff(showMessages) abort  "{{{1
+    " Turn listmode off and restore mappings
     call listmode#RestoreMapping(b:listmode_indent_normal, g:ListMode_indent_normal, 'n')
     call listmode#RestoreMapping(b:listmode_indent_insert, g:ListMode_indent_insert, 'i')
     call listmode#RestoreMapping(b:listmode_outdent_normal, g:ListMode_outdent_normal, 'n')
@@ -101,7 +104,8 @@ function! listmode#ListModeOff(showMessages)  " Turn listmode off and restore ma
     endif
 endfunction
 
-function! listmode#ToggleListMode(...) " Switches between mappings {{{1
+function! listmode#ToggleListMode(...) abort  "{{{1
+    " Switches between mappings
     if a:0
         let l:showMessages = 0
     else
@@ -122,55 +126,57 @@ endfunction
 " Main ListMode code
 " =============================================================================
 
-function! listmode#IsUList(line) " {{{1
+function! listmode#IsUList(line) abort  "{{{1
     " Check if line is unordered list
 	return match(a:line, '^\s*[-*+]\s') >= 0
 endfunction
 
-function! listmode#IsOList(line) " {{{1
+function! listmode#IsOList(line) abort  "{{{1
     " Check if line is ordered list
 	return match(a:line, '^\s*(\?[0-9]\+[.)]\s') >= 0
 endfunction
 
-function! listmode#IsNumberedList(line) " {{{1
+function! listmode#IsNumberedList(line) abort  "{{{1
     " Check if line is special list 1
 	return match(a:line, '^\s*#\+\.\s') >= 0
 endfunction
 
-function! listmode#IsExampleList(line) " {{{1
+function! listmode#IsExampleList(line) abort  "{{{1
     " Check if line is special list 2
 	return match(a:line, '^\s*(\?@[A-z0-9\-_]*[.)]\s') >= 0
 endfunction
 
-function! listmode#FindExampleListKey(line) " {{{1
+function! listmode#FindExampleListKey(line) abort  "{{{1
 	" Find the key for special list 2 (such as: "@key. item")
 	let l:myMatch = matchlist(a:line, '^\s*(\?\(@[A-z0-9\-_]*\)[.)]\s')
 	return l:myMatch[1] . '. '
 endfunction
 
-function! listmode#IsDescList(lines) " {{{1
+function! listmode#IsDescList(lines) abort  "{{{1
     " Check if lines (list of single lines) contains a description list
 	let l:text = join(a:lines, "\n")
 	return match(l:text, '^\s*\S.*\n\s*[:~]\s\+\S') >= 0
 endfunction
 
-function! listmode#IsWhiteSpace(line) " {{{1
+function! listmode#IsWhiteSpace(line) abort  "{{{1
     " Check if line contains only whitespace
 	return a:line =~# '^\s*$'
 endfunction
 
-function! listmode#IsListSeparator(line) "{{{1
+function! listmode#IsListSeparator(line) abort  "{{{1
+    
     " Check if line is a list separator (`<!-- -->`)
     return a:line =~# '^\s*<!-- -->\s*$'
 endfunction
 
-function! listmode#IsIndentedText(line) "{{{1
+function! listmode#IsIndentedText(line) abort  "{{{1
+    
     " Check if line is indented text -- not a list, but not something that
     " breaks a list, either.
     return a:line =~# '^\(\t\|    \)'
 endfunction
 
-function! listmode#FindLevel(line) " {{{1
+function! listmode#FindLevel(line) abort  "{{{1
     " Find indentation level of line
 	let l:nonSpaceIndex = match(a:line, '\S')
 	let l:initialSpaces = a:line[:l:nonSpaceIndex]
@@ -178,7 +184,7 @@ function! listmode#FindLevel(line) " {{{1
 	return len(l:initialSpaces) / 4
 endfunction
 
-function! listmode#FindListType(line) " {{{1
+function! listmode#FindListType(line) abort  "{{{1
     " Find type of list of current line. ("ol" = ordered list; "ul" = unordered
     " list; "nl" = numbered lists ("#. "); "el" = special list #2; "dl" =
     " description list; "te" = text in list.)
@@ -203,12 +209,12 @@ function! listmode#FindListType(line) " {{{1
 	endif
 endfunction
 
-function! listmode#IsList(line) " {{{1
+function! listmode#IsList(line) abort  "{{{1
     let l:listType = listmode#FindListType(a:line)
-    return l:listType !=# '0' && l:listType !=# 'empty' && l:listType ~=# 'te'
+    return l:listType !=# '0' && l:listType !=# 'empty' && l:listType =~# 'te'
 endfunction
 
-function! listmode#LineContent(line) " {{{1
+function! listmode#LineContent(line) abort  "{{{1
     " Return content of line, stripped of any white space and list indicators at
     " the beginning of the line.
 	if index(['ol','ul','nl','el','empty'], listmode#FindListType(a:line)) >= 0
@@ -224,7 +230,7 @@ function! listmode#LineContent(line) " {{{1
 	endif
 endfunction
 
-function! listmode#FindListScope() " {{{1
+function! listmode#FindListScope() abort  "{{{1
     " Find set of lines around cursor that is a list
     let l:lineNumber = s:lineNumber
 	let l:listType = listmode#FindListType(s:bufferText[l:lineNumber])
@@ -309,7 +315,7 @@ function! listmode#FindListScope() " {{{1
 	endif
 endfunction
 
-function! listmode#PlaceCursor(line, prefix, column) " {{{1
+function! listmode#PlaceCursor(line, prefix, column) abort  "{{{1
     " PlaceCursor() will take a line, a prefix to be added to that line's content,
     " and a cursor position of the original line, and calculate a new cursor
     " position with the prefix added.
@@ -323,7 +329,8 @@ function! listmode#PlaceCursor(line, prefix, column) " {{{1
 	return l:cursorColumn
 endfunction
 
-function! listmode#InitializeListFunctions() "{{{1
+function! listmode#InitializeListFunctions() abort  "{{{1
+    
     " Set variables for common list functions
 	let s:bufferText = getline(0,'$')
 	let [s:bufferNumber, s:lineNumber, s:cursorColumn, s:cursorOffset] = getpos('.')
@@ -344,7 +351,7 @@ function! listmode#InitializeListFunctions() "{{{1
     let s:listDef = {'ol': '1. ', 'ul': g:ListMode_unordered_char . ' ', 'nl': '#. ', 'el': '@. ', 'empty': '', 'dl': '', 'nolist': '', 'ls': '', 'te': ''} 
 endfunction
 
-function! listmode#ReformatList() " {{{1
+function! listmode#ReformatList() abort  "{{{1
     " Finds list surrounding current cursor location and reformats it
     call listmode#InitializeListFunctions()
 	if s:listEndLineNumber == 0  " Not in a list!
@@ -435,7 +442,7 @@ function! listmode#ReformatList() " {{{1
 	call setpos('.', [s:bufferNumber, s:lineNumber + 1, l:newCursorColumn, s:cursorOffset])
 endfunction
 
-function! listmode#IndentLine() " {{{1
+function! listmode#IndentLine() abort  "{{{1
     " Indent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
     let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
@@ -454,7 +461,7 @@ function! listmode#IndentLine() " {{{1
 	call listmode#ReformatList()
 endfunction
 
-function! listmode#OutdentLine() " {{{1
+function! listmode#OutdentLine() abort  "{{{1
     " Outdent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
 	if s:currentLineLevel > 0  " We need to outdent
@@ -480,10 +487,9 @@ function! listmode#OutdentLine() " {{{1
 	call listmode#ReformatList()
 endfunction
 
-function! listmode#ChangeListType(listRotation) " {{{1
+function! listmode#ChangeListType(listRotation) abort  "{{{1
     " ChangeListType() will search backwards and forwards in theList to find all
     " siblings of the current line and will change them to a given list type.
-    "
     " a:listRotation specifies how list types rotate: ordered lists become
     " unordered lists; everything else becomes an ordered list.	
     call listmode#InitializeListFunctions()
@@ -545,17 +551,17 @@ function! listmode#ChangeListType(listRotation) " {{{1
 	call listmode#ReformatList()
 endfunction
 
-function! listmode#ChangeListTypeForward() " {{{1
+function! listmode#ChangeListTypeForward() abort  "{{{1
 	let l:listRotation = g:ListMode_list_rotation_forward
     call listmode#ChangeListType(l:listRotation)
 endfunction
 
-function! listmode#ChangeListTypeBackward() " {{{1
+function! listmode#ChangeListTypeBackward() abort  "{{{1
     let l:listRotation = g:ListMode_list_rotation_backward
     call listmode#ChangeListType(l:listRotation)
 endfunction
 
-function! listmode#NewListItem() " {{{1
+function! listmode#NewListItem() abort  "{{{1
     " Add new list item above or below current line (depending on whether the
     " cursor is before or after the start of the line content).
     call listmode#InitializeListFunctions()
@@ -622,7 +628,7 @@ function! listmode#NewListItem() " {{{1
 	call listmode#ReformatList()
 endfunction
 " }}}
-function! listmode#GoToStartOfListItem()  " {{{1
+function! listmode#GoToStartOfListItem() abort  "{{{1
     let l:thisLine = getline('.')
     if empty(l:thisLine)
         return
@@ -644,7 +650,7 @@ endfunction
 " Functions defining list text object
 " =============================================================================
 
-function! listmode#CurrentListItemA() " {{{1
+function! listmode#CurrentListItemA() abort  "{{{1
     let l:thisLine = getline('.')
     if empty(l:thisLine)
         return 0
@@ -662,7 +668,7 @@ function! listmode#CurrentListItemA() " {{{1
     endif
 endfunction
 
-function! listmode#CurrentListItemI() " {{{1
+function! listmode#CurrentListItemI() abort  "{{{1
     let l:thisLine = getline('.')
     if empty(l:thisLine)
         return 0
@@ -686,7 +692,7 @@ endfunction
 " <http://learnvimscriptthehardway.stevelosh.com/chapters/49.html>
 " =============================================================================
 
-function! listmode#NextNonBlankLine(lnum) " {{{1
+function! listmode#NextNonBlankLine(lnum) abort  "{{{1
     " Find line number of next non-blank line
     let l:current = a:lnum + 1
     while l:current <= line('$')
@@ -698,7 +704,7 @@ function! listmode#NextNonBlankLine(lnum) " {{{1
     return -2
 endfunction
 
-function! listmode#GetListModeFold(lnum) " {{{1
+function! listmode#GetListModeFold(lnum) abort  "{{{1
     " Find fold level of line at given line number
 	let l:thisLine = getline(a:lnum)
 	if listmode#IsWhiteSpace(l:thisLine)
@@ -717,7 +723,7 @@ function! listmode#GetListModeFold(lnum) " {{{1
 	return 0
 endfunction
 
-function! listmode#FoldText() " {{{1
+function! listmode#FoldText() abort  "{{{1
     " Provide text for line when folded
 	let l:foldLineCount = v:foldend - v:foldstart
 	return v:folddashes . getline(v:foldstart)[:max([0, winwidth(0) - 24])] . ' / ' . l:foldLineCount . ' sub-items / '

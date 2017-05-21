@@ -68,11 +68,13 @@ let g:ListMode_list_rotation_backward = get(g:, 'ListMode_list_rotation_backward
 " Text Objects -- define these only if vim-textobj-user is loaded
 " =============================================================================
 
-call textobj#user#plugin('listmode', {
-\   '-': {
-\   'select-a-function': 'listmode#CurrentListItemA',
-\   'select-a': 'a' . g:ListMode_textobj,
-\   'select-i-function': 'listmode#CurrentListItemI',
-\   'select-i': 'i' . g:ListMode_textobj,
-\   },
-\ })
+try
+    call textobj#user#plugin('listmode', {
+    \   '-': {
+    \   'select-a-function': 'listmode#CurrentListItemA',
+    \   'select-a': 'a' . g:ListMode_textobj,
+    \   'select-i-function': 'listmode#CurrentListItemI',
+    \   'select-i': 'i' . g:ListMode_textobj,
+    \   },
+    \ })
+endtry
