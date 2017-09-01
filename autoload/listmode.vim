@@ -126,6 +126,15 @@ endfunction
 " Main ListMode code
 " =============================================================================
 
+" Using spaces or tabs?
+function! IndentText() abort "{{{1
+    if &expandtab
+        return '    '
+    else
+        return "\t"
+    endif
+endfunction
+
 function! listmode#IsUList(line) abort  "{{{1
     " Check if line is unordered list
 	return match(a:line, '^\s*[-*+]\s') >= 0
@@ -410,7 +419,7 @@ function! listmode#ReformatList() abort  "{{{1
                 let l:listSeparatorFlag = 0
             endif
 			let l:itemText = listmode#LineContent(s:bufferText[l:key])
-			let l:newItemPrefix = repeat("\t", l:listLevel)
+			let l:newItemPrefix = repeat(IndentText(), l:listLevel)
             if l:listType ==# 'ls'
                 let l:listSeparatorFlag = 1
             elseif l:LRType ==# 'ol'
@@ -445,7 +454,7 @@ endfunction
 function! listmode#IndentLine() abort  "{{{1
     " Indent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
-    let l:prefix = repeat("\t", listmode#FindLevel(s:line) + 1)
+    let l:prefix = repeat(IndentText(), listmode#FindLevel(s:line) + 1)
     if s:currentListType ==# 'el'
         let l:prefix .= listmode#FindExampleListKey(s:line)
     else
@@ -465,7 +474,7 @@ function! listmode#OutdentLine() abort  "{{{1
     " Outdent current line, changing list type of lines as appropriate
     call listmode#InitializeListFunctions()
 	if s:currentLineLevel > 0  " We need to outdent
-		let l:prefix = repeat("\t", listmode#FindLevel(s:line) - 1)
+		let l:prefix = repeat(IndentText(), listmode#FindLevel(s:line) - 1)
 		if s:currentListType ==# 'el'
 			let l:prefix .= listmode#FindExampleListKey(s:line)
 		else
@@ -497,7 +506,7 @@ function! listmode#ChangeListType(listRotation) abort  "{{{1
         let l:thisLine = getline('.')
         if (listmode#LineContent(getline(s:lineNumber)) ==# '' || listmode#IsList(getline(s:lineNumber))) && (listmode#LineContent(getline(s:lineNumber + 2)) ==# '' || listmode#IsList(getline(s:lineNumber + 2)))
             let l:thisLineLevel = listmode#FindLevel(l:thisLine)
-            let l:prefix = repeat("\t", l:thisLineLevel) . '1. '
+            let l:prefix = repeat(IndentText(), l:thisLineLevel) . '1. '
             call setline('.', l:prefix . listmode#LineContent(l:thisLine))
             call setpos('.', [s:bufferNumber, s:lineNumber + 1, s:cursorColumn + 3, s:cursorOffset])
         else
@@ -515,7 +524,7 @@ function! listmode#ChangeListType(listRotation) abort  "{{{1
 		return
 	endif
 	let l:newType = a:listRotation[s:currentListType]
-	let l:prefix = repeat("\t", s:currentLineLevel) . l:newType
+	let l:prefix = repeat(IndentText(), s:currentLineLevel) . l:newType
 	let l:newCursorColumn = listmode#PlaceCursor(s:line, l:prefix, s:cursorColumn)
 	let l:newLine = l:prefix . listmode#LineContent(s:line)
 	if s:lineNumber > s:listBeginLineNumber  " ... we need to search backwards to change list type
@@ -608,7 +617,7 @@ function! listmode#NewListItem() abort  "{{{1
         endif
     endif
     let l:linePrefixLength = len(s:line) - len(l:lineContent)
-    let l:prefix = repeat("\t", s:currentLineLevel) . s:listDef[s:currentListType]
+    let l:prefix = repeat(IndentText(), s:currentLineLevel) . s:listDef[s:currentListType]
     if (s:currentListType ==# 'nolist' && len(s:line) == 0) || l:linePrefixLength <= s:cursorColumn - 1
         " If cursor is placed after start of line content: need to create new line below
         " ... unless we're not in a list.
