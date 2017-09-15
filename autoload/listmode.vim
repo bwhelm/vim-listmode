@@ -220,7 +220,7 @@ endfunction
 
 function! listmode#IsList(line) abort  "{{{1
     let l:listType = listmode#FindListType(a:line)
-    return l:listType !=# '0' && l:listType !=# 'empty' && l:listType =~# 'te'
+    return l:listType !=# '0' && l:listType !=# 'empty' && l:listType !~# 'te'
 endfunction
 
 function! listmode#LineContent(line) abort  "{{{1
@@ -672,6 +672,7 @@ function! listmode#CurrentListItemA() abort  "{{{1
 		echohl None
         return 0
     else
+        let [l:a, l:b, l:c, l:d] = getpos('.')
         let l:endPosition = col('$') - 1
         return ['v', [l:a, l:b, l:startPosition + 1, l:d], [l:a, l:b, l:endPosition, l:d]]
     endif
@@ -690,9 +691,67 @@ function! listmode#CurrentListItemI() abort  "{{{1
 		echohl None
         return 0
     else
+        let [l:a, l:b, l:c, l:d] = getpos('.')
         let l:endPosition = col('$') - 1
         return ['v', [l:a, l:b, l:startPosition + 1, l:d], [l:a, l:b, l:endPosition, l:d]]
     endif
+endfunction
+
+function! listmode#CurrentListTree(type) abort  "{{{1
+    let l:thisLine = getline('.')
+    if empty(l:thisLine)
+        return 0
+    endif
+    let [l:a, l:b, l:c, l:d] = getpos('.')
+    let l:indentLevel = listmode#FindLevel(l:thisLine)
+    if listmode#IsList(l:thisLine) || listmode#FindLevel(l:thisLine) > 0
+        if a:type == 'a'  " Around list tree -- so search backwards
+            for l:startLine in range(l:b, 1, -1)
+                let l:tempLine = getline(l:startLine)
+                " echom l:startLine . ':' . listmode#IsList(l:tempLine) . '|' . listmode#IsWhiteSpace(l:tempLine)
+                if listmode#FindLevel(l:tempLine) < l:indentLevel && !listmode#IsWhiteSpace(l:tempLine)
+                    break
+                elseif l:indentLevel == 0 && (listmode#FindLevel(l:tempLine) == 0 && !listmode#IsList(l:tempLine) && !listmode#IsWhiteSpace(l:tempLine))
+                    let l:startLine += 1
+                    break
+                endif
+            endfor
+        else  " Inside list tree -- so search from here down
+            let l:startLine = l:b
+            let l:indentLevel += 1
+        endif
+        while listmode#IsWhiteSpace(getline(l:startLine))
+            let l:startLine += 1
+        endwhile
+        " echom l:startLine
+        let l:endLine = line('$')
+        for l:endLine in range(l:b + 1, line('$'))
+            let l:tempLine = getline(l:endLine)
+            " echom l:endLine . ':' . listmode#IsList(l:tempLine) . '|' . listmode#IsWhiteSpace(l:tempLine)
+            if listmode#FindLevel(getline(l:endLine)) < l:indentLevel && !listmode#IsWhiteSpace(getline(l:endLine))
+                let l:endLine -= 1
+                break
+            elseif l:indentLevel == 0 && (listmode#FindLevel(l:tempLine) == 0 && !listmode#IsList(l:tempLine) && !listmode#IsWhiteSpace(l:tempLine))
+                let l:endLine -= 1
+                break
+            endif
+        endfor
+        " echom l:endLine
+        return ['V', [l:a, l:startLine, 0, 0], [l:a, l:endLine, 0, 0]]
+    else
+		echohl WarningMsg
+        echo 'Not a list item!'
+		echohl None
+        return 0
+    endif
+endfunction
+
+function! listmode#CurrentListTreeI() abort  "{{{1
+    return listmode#CurrentListTree('i')
+endfunction
+
+function! listmode#CurrentListTreeA() abort  "{{{1
+    return listmode#CurrentListTree('a')
 endfunction
 " }}}
 

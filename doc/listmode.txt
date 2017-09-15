@@ -58,7 +58,14 @@ into insert mode. Similarly, typing "dal" in normal mode will delete the
 current list item including the list prefix. The character that designates the
 list text object is defined by |g:ListMode_textobj| and is "l" by default. This
 feature requires that the vim-textobj-user plugin
-(<http://www.vim.org/scripts/script.php?script_id=2100>) be installed.
+(<https://github.com/kana/vim-textobj-user>) be installed.
+
+ListMode also defines a list tree text object, so that 'viL' will select the
+current list item and all its offspring, and "vaL" will select the current list
+item and its parent and its parent's offspring. The character that designates
+the list text object is defined by |g:ListModeTree_textobj| and is "L" by
+default. This feature requires that the vim-textobj-user plugin
+(<https://github.com/kana/vim-textobj-user>) be installed.
 
 
 OVERVIEW OF MARKDOWN (AND PANDOC) LISTS               *listmode-markdown-lists*

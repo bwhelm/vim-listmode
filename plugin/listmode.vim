@@ -46,6 +46,12 @@ if len(g:ListMode_textobj) != 1
     let g:ListMode_textobj = 'l'
 endif
 
+let g:ListModeTree_textobj = get(g:, 'ListModeTree_textobj', 'L')
+if len(g:ListModeTree_textobj) != 1
+    echohl WarningMsg | echom "ERROR: g:ListModeTree_textobj must be a single character. Setting to 'l'." | echohl None
+    let g:ListModeTree_textobj = 'L'
+endif
+
 let g:ListMode_unordered_char = get(g:, 'ListMode_unordered_char', '-')
 if g:ListMode_unordered_char !=# '-' && g:ListMode_unordered_char !=# '+' && g:ListMode_unordered_char !=# '*'
     " FIXME: How do I get this warning to be visible to user??
@@ -75,6 +81,14 @@ try
     \   'select-a': 'a' . g:ListMode_textobj,
     \   'select-i-function': 'listmode#CurrentListItemI',
     \   'select-i': 'i' . g:ListMode_textobj,
+    \   },
+    \ })
+    call textobj#user#plugin('listmodetree', {
+    \   '-': {
+    \   'select-a-function': 'listmode#CurrentListTreeA',
+    \   'select-a': 'a' . g:ListModeTree_textobj,
+    \   'select-i-function': 'listmode#CurrentListTreeI',
+    \   'select-i': 'i' . g:ListModeTree_textobj,
     \   },
     \ })
 endtry
