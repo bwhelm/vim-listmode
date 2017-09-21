@@ -5,10 +5,10 @@ in markdown or pandoc.
 
 ## CONTENTS
 
-	1. Function of ListMode
-	2. Overview of Markdown (and Pandoc) Lists
-	3. Configuration
-	4. Limitations
+    1. Function of ListMode
+    2. Overview of Markdown (and Pandoc) Lists
+    3. Configuration
+    4. Limitations
 
 ## FUNCTION OF LISTMODE
 
