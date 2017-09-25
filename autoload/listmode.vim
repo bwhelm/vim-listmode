@@ -160,8 +160,8 @@ endfunction
 " Main ListMode code
 " =============================================================================
 
-" Using spaces or tabs?
 function! s:IndentText() abort "{{{1
+    " Using spaces or tabs?
     if &expandtab
         return '    '
     else
@@ -634,10 +634,10 @@ function! listmode#NewListItem() abort  "{{{1
     endif
     let l:lineContent = <SID>LineContent(s:line)
     if s:currentListType ==# 'empty'
-        " If the current line really is empty (rather than whitespace), need
-        " to add new line below with arbitrary list type. (This will be fixed
-        " when calling listmode#ReformatList().)
         if s:line ==# ''
+            " If the current line really is empty (rather than whitespace),
+            " need to add new line below with arbitrary list type. (This will
+            " be fixed when calling listmode#ReformatList().)
             let l:newLineType = 'ul'
             for l:lineIndex in range(s:lineNumber - 1, s:listBeginLineNumber, -1)
                 let l:thisLine = s:bufferText[l:lineIndex]
@@ -655,14 +655,18 @@ function! listmode#NewListItem() abort  "{{{1
             call listmode#ReformatList()
             return
         else
+            " Current line is only whitespace, so outdent.
             call listmode#OutdentLine()
             return
         endif
     elseif <SID>IsWhiteSpace(l:lineContent) && s:currentListType !=# 'nolist'
         if s:currentLineLevel > 0
+            " If indented, need to outdent.
             call listmode#OutdentLine()
             return
         else
+            " If not indented but has list prefix, delete that prefix and
+            " relocate cursor.
             call setline(s:lineNumber + 1, '')
             call setpos('.', [s:bufferNumber, s:lineNumber + 1, 0, s:cursorOffset])
             call listmode#ReformatList()
@@ -718,14 +722,12 @@ endfunction
 " Functions defining list text object
 " =============================================================================
 
-function! listmode#CurrentListItemA() abort  "{{{1
+function! s:CurrentListItem(matchPattern) abort  "{{{1
     let l:thisLine = getline('.')
     if empty(l:thisLine)
         return 0
     endif
-    let [l:a, l:b, l:c, l:d] = getpos('.')
-    let l:startPosition = match(l:thisLine,
-            \ '\(^\s*\)\@<=\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+')
+    let l:startPosition = match(l:thisLine, a:matchPattern)
     if l:startPosition == -1
         echohl WarningMsg
         echo 'Not a list item!'
@@ -739,25 +741,12 @@ function! listmode#CurrentListItemA() abort  "{{{1
     endif
 endfunction
 
-function! listmode#CurrentListItemI() abort  "{{{1
-    let l:thisLine = getline('.')
-    if empty(l:thisLine)
-        return 0
-    endif
-    let [l:a, l:b, l:c, l:d] = getpos('.')
-    let l:startPosition = match(l:thisLine,
-            \ '\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+\)\@<=\S')
-    if l:startPosition == -1
-        echohl WarningMsg
-        echo 'Not a list item!'
-        echohl None
-        return 0
-    else
-        let [l:a, l:b, l:c, l:d] = getpos('.')
-        let l:endPosition = col('$') - 1
-        return ['v', [l:a, l:b, l:startPosition + 1, l:d],
-                \ [l:a, l:b, l:endPosition, l:d]]
-    endif
+function! listmode#CurrentListItemA() abort "{{{1
+    return <SID>CurrentListItem('\(^\s*\)\@<=\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+')
+endfunction
+
+function! listmode#CurrentListItemI() abort "{{{1
+    return <SID>CurrentListItem('\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+\)\@<=\S')
 endfunction
 
 function! s:CurrentListTree(type) abort  "{{{1
