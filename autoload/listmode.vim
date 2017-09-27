@@ -176,12 +176,12 @@ endfunction
 
 function! s:IsOList(line) abort  "{{{1
     " Check if line is ordered list
-    return match(a:line, '^\s*(\?[0-9]\+[.)]\s') >= 0
+    return match(a:line, '^\s*(\?\d\+[.)]\s') >= 0
 endfunction
 
 function! s:IsNumberedList(line) abort  "{{{1
     " Check if line is special list 1
-    return match(a:line, '^\s*#\+\.\s') >= 0
+    return match(a:line, '^\s*#\.\s') >= 0
 endfunction
 
 function! s:IsExampleList(line) abort  "{{{1
