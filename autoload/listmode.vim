@@ -701,7 +701,8 @@ endfunction
 " }}}
 function! listmode#GoToStartOfListItem() abort  "{{{1
     let l:thisLine = getline('.')
-    if empty(l:thisLine)
+    if empty(l:thisLine) || !<SID>IsList(l:thisLine)
+        normal! _
         return
     endif
     let [l:a, l:b, l:c, l:d] = getpos('.')
