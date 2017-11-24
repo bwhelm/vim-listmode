@@ -70,7 +70,7 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
         " Note: We want these to involve ListMode's <CR>, so shouldn't use
         " nnoremap`.
         nmap <buffer> o A<CR>
-        nmap <buffer> O I<CR>
+        nmap <buffer> O A<CR><Esc>ddkPA
     endif
     let b:listmode_separator_mapping = maparg(g:ListMode_separator, 'i', 0, 1)
     execute 'inoremap <buffer> <silent>' g:ListMode_separator '<!-- --><CR><CR>'
