@@ -32,6 +32,7 @@ let g:ListMode_changetype_backward_insert = get(g:, 'ListMode_changetype_backwar
 let g:ListMode_changetype_forward_insert = get(g:, 'ListMode_changetype_forward_insert', g:vim_listmode_map_prefix . ']')
 let g:ListMode_separator = get(g:, 'ListMode_separator', '<LocalLeader>-')
 let g:ListMode_go_to_start_of_line = get(g:, 'ListMode_go_to_start_of_line', '_')
+let g:ListMode_insert_at_start = get(g:, 'ListMode_insert_at_start', 'I')
 
 execute 'noremap <unique>' g:vim_listmode_toggle ':ListModeToggle<CR>'
 execute 'noremap <unique>' g:vim_listmode_reformat ':ListModeReformat<CR>'

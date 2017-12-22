@@ -20,7 +20,7 @@ endfunction
 
 function! listmode#ListModeOn(showMessages) abort  "{{{1
     " Turn listmode on -- set all mappings
-    let b:listmode_indent_normal = 
+    let b:listmode_indent_normal =
             \ maparg(g:ListMode_indent_normal, 'n', 0, 1)
     let b:listmode_indent_insert =
             \ maparg(g:ListMode_indent_insert, 'i', 0, 1)
@@ -42,6 +42,8 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
             \ maparg(g:ListMode_changetype_backward_insert, 'i', 0, 1)
     let b:listmode_go_to_start_of_line =
             \ maparg(g:ListMode_go_to_start_of_line, 'n', 0, 1)
+    let b:listmode_insert_at_start_of_line =
+            \ maparg(g:ListMode_insert_at_start, 'n', 0, 1)
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_indent_normal ':call listmode#IndentLine()<CR>'
     execute 'inoremap <buffer> <silent>'
@@ -64,6 +66,8 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
             \ g:ListMode_changetype_backward_insert "<C-\\><C-o>:call listmode#ChangeListTypeBackward()<CR>"
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_go_to_start_of_line ':call listmode#GoToStartOfListItem()<CR>'
+    execute 'nnoremap <buffer> <silent>'
+            \ g:ListMode_insert_at_start ':call listmode#GoToStartOfListItem()<CR>i'
     if g:ListMode_remap_oO
         let b:listmode_o_mapping = maparg('o', 'n', 0, 1)
         let b:listmode_O_mapping = maparg('O', 'n', 0, 1)
@@ -117,6 +121,8 @@ function! listmode#ListModeOff(showMessages) abort  "{{{1
             \ g:ListMode_changetype_backward_insert, 'i')
     call listmode#RestoreMapping(b:listmode_go_to_start_of_line,
             \ g:ListMode_go_to_start_of_line, 'n')
+    call listmode#RestoreMapping(b:listmode_insert_at_start_of_line,
+            \ g:ListMode_insert_at_start, 'n')
     if g:ListMode_remap_oO
         call listmode#RestoreMapping(b:listmode_o_mapping, 'o', 'n')
         call listmode#RestoreMapping(b:listmode_O_mapping, 'O', 'n')
