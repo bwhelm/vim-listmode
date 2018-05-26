@@ -73,11 +73,13 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
         let b:listmode_O_mapping = maparg('O', 'n', 0, 1)
         " Note: We want these to involve ListMode's <CR>, so shouldn't use
         " nnoremap`.
-        nmap <buffer> o A<CR>
-        nmap <buffer> O A<CR><Esc>ddkPA
+        " TODO: Rewrite the `O` mapping to use a function and avoid changing
+        " registers.
+        nnoremap <buffer> o A<C-\><C-o>:call listmode#NewListItem()<CR>
+        nnoremap <buffer> O A<C-\><C-o>:call listmode#NewListItem()<CR><Esc>"zddk"zP:ListModeReformat<CR>A
     endif
     let b:listmode_separator_mapping = maparg(g:ListMode_separator, 'i', 0, 1)
-    execute 'inoremap <buffer> <silent>' g:ListMode_separator '<!-- --><CR><CR>'
+    execute 'inoremap <buffer> <silent>' g:ListMode_separator '<!----><CR><CR>'
 
     let b:listmode = 1
 
@@ -214,8 +216,8 @@ endfunction
 
 function! s:IsListSeparator(line) abort  "{{{1
     
-    " Check if line is a list separator (`<!-- -->`)
-    return a:line =~# '^\s*<!-- -->\s*$'
+    " Check if line is a list separator (`<!---->`)
+    return a:line =~# '^\s*<!--\s*-->\s*$'
 endfunction
 
 function! s:IsIndentedText(line) abort  "{{{1
@@ -386,7 +388,6 @@ function! s:PlaceCursor(line, prefix, column) abort  "{{{1
 endfunction
 
 function! s:InitializeListFunctions() abort  "{{{1
-    
     " Set variables for common list functions
     let s:bufferText = getline(0,'$')
     let [s:bufferNumber, s:lineNumber, s:cursorColumn, s:cursorOffset] = getpos('.')
@@ -704,7 +705,7 @@ function! listmode#NewListItem() abort  "{{{1
             \ l:newCursorColumn + 1, s:cursorOffset])
     call listmode#ReformatList()
 endfunction
-" }}}
+
 function! listmode#GoToStartOfListItem() abort  "{{{1
     let l:thisLine = getline('.')
     if empty(l:thisLine) || !<SID>IsList(l:thisLine)
