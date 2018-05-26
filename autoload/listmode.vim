@@ -4,7 +4,7 @@
 " Cope with mappings
 " =============================================================================
 
-function! listmode#RestoreMapping(mapDict, key, mode) abort  "{{{1
+function! s:RestoreMapping(mapDict, key, mode) abort  "{{{1
     " Restores mapping saved in mapDict
     execute a:mode . 'unmap <buffer> ' . a:key
     if !empty(a:mapDict)
@@ -45,29 +45,29 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
     let b:listmode_insert_at_start_of_line =
             \ maparg(g:ListMode_insert_at_start, 'n', 0, 1)
     execute 'nnoremap <buffer> <silent>'
-            \ g:ListMode_indent_normal ':call listmode#IndentLine()<CR>'
+            \ g:ListMode_indent_normal ':call <SID>IndentLine()<CR>'
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_indent_insert "<C-\\><C-o>:call listmode#IndentLine()<CR>"
+            \ g:ListMode_indent_insert "<C-\\><C-o>:call <SID>IndentLine()<CR>"
     execute 'nnoremap <buffer> <silent>'
-            \ g:ListMode_outdent_normal ':call listmode#OutdentLine()<CR>'
+            \ g:ListMode_outdent_normal ':call <SID>OutdentLine()<CR>'
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_outdent_insert "<C-\\><C-o>:call listmode#OutdentLine()<CR>"
+            \ g:ListMode_outdent_insert "<C-\\><C-o>:call <SID>OutdentLine()<CR>"
     execute 'nnoremap <buffer> <silent>'
-            \ g:ListMode_newitem_normal ':call listmode#NewListItem()<CR>'
+            \ g:ListMode_newitem_normal ':call <SID>NewListItem()<CR>'
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_newitem_insert "<C-\\><C-o>:call listmode#NewListItem()<CR>"
+            \ g:ListMode_newitem_insert "<C-\\><C-o>:call <SID>NewListItem()<CR>"
     execute 'nnoremap <buffer> <silent>'
-            \ g:ListMode_changetype_forward_normal ':call listmode#ChangeListTypeForward()<CR>'
+            \ g:ListMode_changetype_forward_normal ':call <SID>ChangeListTypeForward()<CR>'
     execute 'nnoremap <buffer> <silent>'
-            \ g:ListMode_changetype_backward_normal ':call listmode#ChangeListTypeBackward()<CR>'
+            \ g:ListMode_changetype_backward_normal ':call <SID>ChangeListTypeBackward()<CR>'
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_changetype_forward_insert "<C-\\><C-o>:call listmode#ChangeListTypeForward()<CR>"
+            \ g:ListMode_changetype_forward_insert "<C-\\><C-o>:call <SID>ChangeListTypeForward()<CR>"
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_changetype_backward_insert "<C-\\><C-o>:call listmode#ChangeListTypeBackward()<CR>"
+            \ g:ListMode_changetype_backward_insert "<C-\\><C-o>:call <SID>ChangeListTypeBackward()<CR>"
     execute 'nnoremap <buffer> <silent>'
-            \ g:ListMode_go_to_start_of_line ':call listmode#GoToStartOfListItem()<CR>'
+            \ g:ListMode_go_to_start_of_line ':call <SID>GoToStartOfListItem()<CR>'
     execute 'nnoremap <buffer> <silent>'
-            \ g:ListMode_insert_at_start ':call listmode#GoToStartOfListItem()<CR>i'
+            \ g:ListMode_insert_at_start ':call <SID>GoToStartOfListItem()<CR>i'
     if g:ListMode_remap_oO
         let b:listmode_o_mapping = maparg('o', 'n', 0, 1)
         let b:listmode_O_mapping = maparg('O', 'n', 0, 1)
@@ -75,8 +75,8 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
         " nnoremap`.
         " TODO: Rewrite the `O` mapping to use a function and avoid changing
         " registers.
-        nnoremap <buffer> o A<C-\><C-o>:call listmode#NewListItem()<CR>
-        nnoremap <buffer> O A<C-\><C-o>:call listmode#NewListItem()<CR><Esc>"zddk"zP:ListModeReformat<CR>A
+        nnoremap <buffer> o A<C-\><C-o>:call <SID>NewListItem()<CR>
+        nnoremap <buffer> O A<C-\><C-o>:call <SID>NewListItem()<CR><Esc>"zddk"zP:ListModeReformat<CR>A
     endif
     let b:listmode_separator_mapping = maparg(g:ListMode_separator, 'i', 0, 1)
     execute 'inoremap <buffer> <silent>' g:ListMode_separator '<!----><CR><CR>'
@@ -89,8 +89,8 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
         let b:oldfoldexpr=&foldexpr
         let b:oldfoldtext=&foldtext
         setlocal foldmethod=expr
-        setlocal foldexpr=listmode#GetListModeFold(v:lnum)
-        setlocal foldtext=listmode#FoldText()
+        setlocal foldexpr=<SID>GetListModeFold(v:lnum)
+        setlocal foldtext=<SID>FoldText()
     endif
     if a:showMessages
         echohl Comment
@@ -99,37 +99,37 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
     endif
 endfunction
 
-function! listmode#ListModeOff(showMessages) abort  "{{{1
+function! s:ListModeOff(showMessages) abort  "{{{1
     " Turn listmode off and restore mappings
-    call listmode#RestoreMapping(b:listmode_indent_normal,
+    call <SID>RestoreMapping(b:listmode_indent_normal,
             \ g:ListMode_indent_normal, 'n')
-    call listmode#RestoreMapping(b:listmode_indent_insert,
+    call <SID>RestoreMapping(b:listmode_indent_insert,
             \ g:ListMode_indent_insert, 'i')
-    call listmode#RestoreMapping(b:listmode_outdent_normal,
+    call <SID>RestoreMapping(b:listmode_outdent_normal,
             \ g:ListMode_outdent_normal, 'n')
-    call listmode#RestoreMapping(b:listmode_outdent_insert,
+    call <SID>RestoreMapping(b:listmode_outdent_insert,
             \ g:ListMode_outdent_insert, 'i')
-    call listmode#RestoreMapping(b:listmode_newitem_normal,
+    call <SID>RestoreMapping(b:listmode_newitem_normal,
             \ g:ListMode_newitem_normal, 'n')
-    call listmode#RestoreMapping(b:listmode_newitem_insert,
+    call <SID>RestoreMapping(b:listmode_newitem_insert,
             \ g:ListMode_newitem_insert, 'i')
-    call listmode#RestoreMapping(b:listmode_changetype_forward_normal,
+    call <SID>RestoreMapping(b:listmode_changetype_forward_normal,
             \ g:ListMode_changetype_forward_normal, 'n')
-    call listmode#RestoreMapping(b:listmode_changetype_backward_normal,
+    call <SID>RestoreMapping(b:listmode_changetype_backward_normal,
             \ g:ListMode_changetype_backward_normal, 'n')
-    call listmode#RestoreMapping(b:listmode_changetype_forward_insert,
+    call <SID>RestoreMapping(b:listmode_changetype_forward_insert,
             \ g:ListMode_changetype_forward_insert, 'i')
-    call listmode#RestoreMapping(b:listmode_changetype_backward_insert,
+    call <SID>RestoreMapping(b:listmode_changetype_backward_insert,
             \ g:ListMode_changetype_backward_insert, 'i')
-    call listmode#RestoreMapping(b:listmode_go_to_start_of_line,
+    call <SID>RestoreMapping(b:listmode_go_to_start_of_line,
             \ g:ListMode_go_to_start_of_line, 'n')
-    call listmode#RestoreMapping(b:listmode_insert_at_start_of_line,
+    call <SID>RestoreMapping(b:listmode_insert_at_start_of_line,
             \ g:ListMode_insert_at_start, 'n')
     if g:ListMode_remap_oO
-        call listmode#RestoreMapping(b:listmode_o_mapping, 'o', 'n')
-        call listmode#RestoreMapping(b:listmode_O_mapping, 'O', 'n')
+        call <SID>RestoreMapping(b:listmode_o_mapping, 'o', 'n')
+        call <SID>RestoreMapping(b:listmode_O_mapping, 'O', 'n')
     endif
-    call listmode#RestoreMapping(b:listmode_separator_mapping,
+    call <SID>RestoreMapping(b:listmode_separator_mapping,
             \ g:ListMode_separator, 'i')
     let b:listmode=0
 
@@ -146,7 +146,7 @@ function! listmode#ListModeOff(showMessages) abort  "{{{1
     endif
 endfunction
 
-function! listmode#ToggleListMode(...) abort  "{{{1
+function! s:ToggleListMode(...) abort  "{{{1
     " Switches between mappings
     if a:0
         let l:showMessages = 0
@@ -157,7 +157,7 @@ function! listmode#ToggleListMode(...) abort  "{{{1
         let b:listmode = 0  " Start with listmode off by default with new buffer
     endif
     if b:listmode        " Need to swap keymappings back
-        call listmode#ListModeOff(l:showMessages)
+        call <SID>ListModeOff(l:showMessages)
     else                " Need to save keymappings and generate new ones
         call listmode#ListModeOn(l:showMessages)
     endif
@@ -505,7 +505,7 @@ function! listmode#ReformatList() abort  "{{{1
                 \ l:newCursorColumn, s:cursorOffset])
 endfunction
 
-function! listmode#IndentLine() abort  "{{{1
+function! s:IndentLine() abort  "{{{1
     " Indent current line, changing list type of lines as appropriate
     call <SID>InitializeListFunctions()
     let l:prefix = repeat(s:IndentText(), <SID>FindLevel(s:line) + 1)
@@ -524,7 +524,7 @@ function! listmode#IndentLine() abort  "{{{1
     call listmode#ReformatList()
 endfunction
 
-function! listmode#OutdentLine() abort  "{{{1
+function! s:OutdentLine() abort  "{{{1
     " Outdent current line, changing list type of lines as appropriate
     call <SID>InitializeListFunctions()
     if s:currentLineLevel > 0  " We need to outdent
@@ -618,17 +618,17 @@ function! s:ChangeListType(listRotation) abort  "{{{1
     call listmode#ReformatList()
 endfunction
 
-function! listmode#ChangeListTypeForward() abort  "{{{1
+function! s:ChangeListTypeForward() abort  "{{{1
     let l:listRotation = g:ListMode_list_rotation_forward
     call <SID>ChangeListType(l:listRotation)
 endfunction
 
-function! listmode#ChangeListTypeBackward() abort  "{{{1
+function! s:ChangeListTypeBackward() abort  "{{{1
     let l:listRotation = g:ListMode_list_rotation_backward
     call <SID>ChangeListType(l:listRotation)
 endfunction
 
-function! listmode#NewListItem() abort  "{{{1
+function! s:NewListItem() abort  "{{{1
     " Add new list item above or below current line (depending on whether the
     " cursor is before or after the start of the line content).
     call <SID>InitializeListFunctions()
@@ -663,13 +663,13 @@ function! listmode#NewListItem() abort  "{{{1
             return
         else
             " Current line is only whitespace, so outdent.
-            call listmode#OutdentLine()
+            call <SID>OutdentLine()
             return
         endif
     elseif <SID>IsWhiteSpace(l:lineContent) && s:currentListType !=# 'nolist'
         if s:currentLineLevel > 0
             " If indented, need to outdent.
-            call listmode#OutdentLine()
+            call <SID>OutdentLine()
             return
         else
             " If not indented but has list prefix, delete that prefix and
@@ -706,7 +706,7 @@ function! listmode#NewListItem() abort  "{{{1
     call listmode#ReformatList()
 endfunction
 
-function! listmode#GoToStartOfListItem() abort  "{{{1
+function! s:GoToStartOfListItem() abort  "{{{1
     let l:thisLine = getline('.')
     if empty(l:thisLine) || !<SID>IsList(l:thisLine)
         normal! _
@@ -749,11 +749,11 @@ function! s:CurrentListItem(matchPattern) abort  "{{{1
     endif
 endfunction
 
-function! listmode#CurrentListItemA() abort "{{{1
+function! s:CurrentListItemA() abort "{{{1
     return <SID>CurrentListItem('\(^\s*\)\@<=\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+')
 endfunction
 
-function! listmode#CurrentListItemI() abort "{{{1
+function! s:CurrentListItemI() abort "{{{1
     return <SID>CurrentListItem('\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+\)\@<=\S')
 endfunction
 
@@ -810,11 +810,11 @@ function! s:CurrentListTree(type) abort  "{{{1
     endif
 endfunction
 
-function! listmode#CurrentListTreeI() abort  "{{{1
+function! s:CurrentListTreeI() abort  "{{{1
     return <SID>CurrentListTree('i')
 endfunction
 
-function! listmode#CurrentListTreeA() abort  "{{{1
+function! s:CurrentListTreeA() abort  "{{{1
     return <SID>CurrentListTree('a')
 endfunction
 " }}}
@@ -836,7 +836,7 @@ function! s:NextNonBlankLine(lnum) abort  "{{{1
     return -2
 endfunction
 
-function! listmode#GetListModeFold(lnum) abort  "{{{1
+function! s:GetListModeFold(lnum) abort  "{{{1
     " Find fold level of line at given line number
     let l:thisLine = getline(a:lnum)
     if <SID>IsWhiteSpace(l:thisLine)
@@ -855,7 +855,7 @@ function! listmode#GetListModeFold(lnum) abort  "{{{1
     return 0
 endfunction
 
-function! listmode#FoldText() abort  "{{{1
+function! s:FoldText() abort  "{{{1
     " Provide text for line when folded
     let l:foldLineCount = v:foldend - v:foldstart
     return v:folddashes . getline(v:foldstart)[:max([0, winwidth(0) - 24])]
