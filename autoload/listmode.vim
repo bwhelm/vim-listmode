@@ -146,7 +146,7 @@ function! s:ListModeOff(showMessages) abort  "{{{1
     endif
 endfunction
 
-function! s:ToggleListMode(...) abort  "{{{1
+function! listmode#ToggleListMode(...) abort  "{{{1
     " Switches between mappings
     if a:0
         let l:showMessages = 0
