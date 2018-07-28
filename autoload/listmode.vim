@@ -47,23 +47,23 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_indent_normal ':call <SID>IndentLine()<CR>'
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_indent_insert "<C-\\><C-o>:call <SID>IndentLine()<CR>"
+            \ g:ListMode_indent_insert "<C-]><C-\\><C-o>:call <SID>IndentLine()<CR>"
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_outdent_normal ':call <SID>OutdentLine()<CR>'
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_outdent_insert "<C-\\><C-o>:call <SID>OutdentLine()<CR>"
+            \ g:ListMode_outdent_insert "<C-]><C-\\><C-o>:call <SID>OutdentLine()<CR>"
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_newitem_normal ':call <SID>NewListItem()<CR>'
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_newitem_insert "<C-\\><C-o>:call <SID>NewListItem()<CR>"
+            \ g:ListMode_newitem_insert "<C-]><C-\\><C-o>:call <SID>NewListItem()<CR>"
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_changetype_forward_normal ':call <SID>ChangeListTypeForward()<CR>'
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_changetype_backward_normal ':call <SID>ChangeListTypeBackward()<CR>'
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_changetype_forward_insert "<C-\\><C-o>:call <SID>ChangeListTypeForward()<CR>"
+            \ g:ListMode_changetype_forward_insert "<C-]><C-\\><C-o>:call <SID>ChangeListTypeForward()<CR>"
     execute 'inoremap <buffer> <silent>'
-            \ g:ListMode_changetype_backward_insert "<C-\\><C-o>:call <SID>ChangeListTypeBackward()<CR>"
+            \ g:ListMode_changetype_backward_insert "<C-]><C-\\><C-o>:call <SID>ChangeListTypeBackward()<CR>"
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_go_to_start_of_line ':call <SID>GoToStartOfListItem()<CR>'
     execute 'nnoremap <buffer> <silent>'
@@ -79,7 +79,7 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
         nnoremap <buffer> O A<C-\><C-o>:call <SID>NewListItem()<CR><Esc>"zddk"zP:ListModeReformat<CR>A
     endif
     let b:listmode_separator_mapping = maparg(g:ListMode_separator, 'i', 0, 1)
-    execute 'inoremap <buffer> <silent>' g:ListMode_separator '<!----><CR><CR>'
+    execute 'inoremap <buffer> <silent>' g:ListMode_separator '<C-]><!----><CR><CR>'
 
     let b:listmode = 1
 
