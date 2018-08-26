@@ -749,11 +749,11 @@ function! s:CurrentListItem(matchPattern) abort  "{{{1
     endif
 endfunction
 
-function! s:CurrentListItemA() abort "{{{1
+function! listmode#CurrentListItemA() abort "{{{1
     return <SID>CurrentListItem('\(^\s*\)\@<=\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+')
 endfunction
 
-function! s:CurrentListItemI() abort "{{{1
+function! listmode#CurrentListItemI() abort "{{{1
     return <SID>CurrentListItem('\(^\s*\((\?[0-9#]\+[.)]\|(\?@[A-z0-9\-_]*[.)]\|[-*+:]\)\s\+\)\@<=\S')
 endfunction
 
@@ -810,11 +810,11 @@ function! s:CurrentListTree(type) abort  "{{{1
     endif
 endfunction
 
-function! s:CurrentListTreeI() abort  "{{{1
+function! listmode#CurrentListTreeI() abort  "{{{1
     return <SID>CurrentListTree('i')
 endfunction
 
-function! s:CurrentListTreeA() abort  "{{{1
+function! listmode#CurrentListTreeA() abort  "{{{1
     return <SID>CurrentListTree('a')
 endfunction
 " }}}
