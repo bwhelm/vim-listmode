@@ -389,7 +389,7 @@ endfunction
 
 function! s:InitializeListFunctions() abort  "{{{1
     " Set variables for common list functions
-    let s:bufferText = getline(0,'$')
+    let s:bufferText = getline(1,'$')
     let [s:bufferNumber, s:lineNumber, s:cursorColumn, s:cursorOffset] = getpos('.')
     let s:lineNumber -= 1
     let s:line = s:bufferText[s:lineNumber]
@@ -412,9 +412,18 @@ function! s:InitializeListFunctions() abort  "{{{1
             \ 'nolist': '', 'ls': '', 'te': ''} 
 endfunction
 
-function! listmode#ReformatList() abort  "{{{1
+function! listmode#ReformatList(...) abort  "{{{1
     " Finds list surrounding current cursor location and reformats it
     call <SID>InitializeListFunctions()
+    if a:0 == 2
+        " Restrict list scope to range
+        if s:listBeginLineNumber < a:1
+            let s:listBeginLineNumber = a:1 - 1
+        endif
+        if s:listEndLineNumber > a:2
+            let s:listEndLineNumber = a:2 - 1
+        endif
+    endif
     if s:listEndLineNumber == 0  " Not in a list!
         return
     endif

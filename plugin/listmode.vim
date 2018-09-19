@@ -13,7 +13,7 @@ let g:ListMode_loaded = 1
 
 " Define commands
 command! ListModeToggle call listmode#ToggleListMode()
-command! ListModeReformat call listmode#ReformatList()
+command! -range=% ListModeReformat call listmode#ReformatList(<line1>,<line2>)
 
 " Default keymappings {{{1
 
