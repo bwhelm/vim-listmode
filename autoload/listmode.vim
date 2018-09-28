@@ -75,8 +75,8 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
         " nnoremap`.
         " TODO: Rewrite the `O` mapping to use a function and avoid changing
         " registers.
-        nnoremap <buffer> o A<C-\><C-o>:call <SID>NewListItem()<CR>
-        nnoremap <buffer> O A<C-\><C-o>:call <SID>NewListItem()<CR><Esc>"zddk"zP:ListModeReformat<CR>A
+        nnoremap <buffer> <silent> o A<C-\><C-o>:call <SID>NewListItem()<CR>
+        nnoremap <buffer> <silent> O A<C-\><C-o>:call <SID>NewListItem()<CR><Esc>"zddk"zP:ListModeReformat<CR>A
     endif
     let b:listmode_separator_mapping = maparg(g:ListMode_separator, 'i', 0, 1)
     execute 'inoremap <buffer> <silent>' g:ListMode_separator '<C-]><!----><CR><CR>'
