@@ -215,13 +215,13 @@ function! s:IsWhiteSpace(line) abort  "{{{1
 endfunction
 
 function! s:IsListSeparator(line) abort  "{{{1
-    
+
     " Check if line is a list separator (`<!---->`)
     return a:line =~# '^\s*<!--\s*-->\s*$'
 endfunction
 
 function! s:IsIndentedText(line) abort  "{{{1
-    
+
     " Check if line is indented text -- not a list, but not something that
     " breaks a list, either.
     return a:line =~# '^\(\t\|    \)'
@@ -229,8 +229,7 @@ endfunction
 
 function! s:FindLevel(line) abort  "{{{1
     " Find indentation level of line
-    let l:nonSpaceIndex = match(a:line, '\S')
-    let l:initialSpaces = a:line[:l:nonSpaceIndex]
+    let l:initialSpaces = a:line[:match(a:line, '\S')]
     let l:initialSpaces = substitute(l:initialSpaces, "\t", '    ', 'g')
     return len(l:initialSpaces) / 4
 endfunction
@@ -286,8 +285,10 @@ function! s:FindListScope() abort  "{{{1
     " Find set of lines around cursor that is a list
     let l:lineNumber = s:lineNumber
     let l:listType = <SID>FindListType(s:bufferText[l:lineNumber])
-    let l:begin = 0  " Catches case when cursor is at start of file, which is also start of list
-    let l:end = len(s:bufferText) - 1  " Catches case in which cursor is at eof, which is also eol
+    let l:begin = 0  " Catches case when cursor is at start of file, which is
+                     " also start of list
+    let l:end = len(s:bufferText) - 1  " Catches case in which cursor is at
+                                       " eof, which is also eol
     if l:listType ==# 'dl'
         let l:lineNumber -= 1  " At second line of DL; go back one line.
     elseif empty(l:listType)
@@ -379,7 +380,8 @@ function! s:PlaceCursor(line, prefix, column) abort  "{{{1
     " position with the prefix added.
     let l:lineContent = <SID>LineContent(a:line)
     let l:linePrefixLength = len(a:line) - len(l:lineContent)
-    if l:linePrefixLength < a:column  " If cursor is placed after start of line content
+    if l:linePrefixLength < a:column  " If cursor is placed after start of
+                                      " line content
         let l:cursorColumn = len(a:prefix) - l:linePrefixLength + a:column
     else
         let l:cursorColumn = len(a:prefix) + 1
@@ -409,7 +411,7 @@ function! s:InitializeListFunctions() abort  "{{{1
     " To convert from listType to the needed (pandoc) markdown
     let s:listDef = {'ol': '1. ', 'ul': g:ListMode_unordered_char . ' ',
             \ 'nl': '#. ', 'el': '@. ', 'empty': '', 'dl': '',
-            \ 'nolist': '', 'ls': '', 'te': ''} 
+            \ 'nolist': '', 'ls': '', 'te': ''}
 endfunction
 
 function! listmode#ReformatList(...) abort  "{{{1
@@ -427,7 +429,7 @@ function! listmode#ReformatList(...) abort  "{{{1
     if s:listEndLineNumber == 0  " Not in a list!
         return
     endif
-    " l:levelRecord is a list of ordered pairs: ("list type", number), where 
+    " l:levelRecord is a list of ordered pairs: ("list type", number), where
     " number designates the current count for ordered lists.
     let l:levelRecord = []
     " Initialize 20 levels of emptiness in levelRecord
@@ -484,6 +486,9 @@ function! listmode#ReformatList(...) abort  "{{{1
             if l:listType ==# 'ls'
                 let l:listSeparatorFlag = 1
             elseif l:LRType ==# 'ol'
+                " if len(l:LRNumber) == 1
+                "     let l:newItemPrefix .= ' '
+                " endif
                 let l:newItemPrefix .= l:LRNumber . '. '
             elseif l:LRType ==# 'el'
                 if <SID>IsExampleList(s:bufferText[l:key])
@@ -563,7 +568,7 @@ function! s:ChangeListType(listRotation) abort  "{{{1
     " ChangeListType() will search backwards and forwards in theList to find all
     " siblings of the current line and will change them to a given list type.
     " a:listRotation specifies how list types rotate: ordered lists become
-    " unordered lists; everything else becomes an ordered list.    
+    " unordered lists; everything else becomes an ordered list.
     call <SID>InitializeListFunctions()
     if s:listEndLineNumber == 0  " Not a list item...
         let l:thisLine = getline('.')
@@ -854,7 +859,7 @@ function! s:GetListModeFold(lnum) abort  "{{{1
     if !empty(s:FindListType(l:thisLine)) || <SID>FindLevel(l:thisLine) > 0
         let l:thisIndent = <SID>FindLevel(l:thisLine) + 1
         let l:nextIndent = <SID>FindLevel(getline(s:NextNonBlankLine(a:lnum))) + 1
-        
+
         if l:nextIndent <= l:thisIndent
             return l:thisIndent
         else  "  l:nextIndent > l:thisIndent
