@@ -66,6 +66,8 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
             \ g:ListMode_changetype_backward_insert "<C-]><C-\\><C-o>:call <SID>ChangeListTypeBackward()<CR>"
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_go_to_start_of_line ':call <SID>GoToStartOfListItem()<CR>'
+    execute 'onoremap <buffer> <silent>'
+            \ g:ListMode_go_to_start_of_line ':call <SID>GoToStartOfListItem()<CR>'
     execute 'nnoremap <buffer> <silent>'
             \ g:ListMode_insert_at_start ':call <SID>GoToStartOfListItem()<CR>i'
     if g:ListMode_remap_oO
@@ -739,7 +741,6 @@ function! s:GoToStartOfListItem() abort  "{{{1
     endif
 endfunction
 "}}}
-
 " =============================================================================
 " Functions defining list text object
 " =============================================================================
