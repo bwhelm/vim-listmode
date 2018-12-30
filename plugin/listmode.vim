@@ -38,7 +38,6 @@ execute 'noremap <silent> <unique>' g:vim_listmode_toggle ':ListModeToggle<CR>'
 execute 'noremap <silent> <unique>' g:vim_listmode_reformat ':ListModeReformat<CR>'
 
 " Default Settings {{{1
-let g:ListMode_folding = get(g:, 'ListMode_folding', 1)
 let g:ListMode_remap_oO = get(g:, 'ListMode_remap_oO', 1)
 
 let g:ListMode_textobj = get(g:, 'ListMode_textobj', 'l')

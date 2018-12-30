@@ -85,15 +85,6 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
 
     let b:listmode = 1
 
-    " Set up folding for later restore
-    if g:ListMode_folding != 0
-        let b:oldfoldmethod=&foldmethod
-        let b:oldfoldexpr=&foldexpr
-        let b:oldfoldtext=&foldtext
-        setlocal foldmethod=expr
-        setlocal foldexpr=<SID>GetListModeFold(v:lnum)
-        setlocal foldtext=<SID>FoldText()
-    endif
     if a:showMessages
         echohl Comment
         echo 'Now entering vim list mode'
@@ -833,46 +824,3 @@ function! listmode#CurrentListTreeA() abort  "{{{1
     return <SID>CurrentListTree('a')
 endfunction
 " }}}
-
-" =============================================================================
-" Folding code. Adapted from:
-" <http://learnvimscriptthehardway.stevelosh.com/chapters/49.html>
-" =============================================================================
-
-function! s:NextNonBlankLine(lnum) abort  "{{{1
-    " Find line number of next non-blank line
-    let l:current = a:lnum + 1
-    while l:current <= line('$')
-        if !s:IsWhiteSpace(getline(l:current))
-            return l:current
-        endif
-        let l:current += 1
-    endwhile
-    return -2
-endfunction
-
-function! s:GetListModeFold(lnum) abort  "{{{1
-    " Find fold level of line at given line number
-    let l:thisLine = getline(a:lnum)
-    if <SID>IsWhiteSpace(l:thisLine)
-        return '-1'
-    endif
-    if !empty(s:FindListType(l:thisLine)) || <SID>FindLevel(l:thisLine) > 0
-        let l:thisIndent = <SID>FindLevel(l:thisLine) + 1
-        let l:nextIndent = <SID>FindLevel(getline(s:NextNonBlankLine(a:lnum))) + 1
-
-        if l:nextIndent <= l:thisIndent
-            return l:thisIndent
-        else  "  l:nextIndent > l:thisIndent
-            return '>' . l:nextIndent
-        endif
-    endif
-    return 0
-endfunction
-
-function! s:FoldText() abort  "{{{1
-    " Provide text for line when folded
-    let l:foldLineCount = v:foldend - v:foldstart
-    return v:folddashes . getline(v:foldstart)[:max([0, winwidth(0) - 24])]
-            \ . ' /' l:foldLineCount 'sub-items / '
-endfunction
