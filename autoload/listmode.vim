@@ -575,7 +575,7 @@ function! s:ChangeListType(listRotation) abort  "{{{1
                     \ s:cursorColumn + 3, s:cursorOffset])
         else
             echohl WarningMsg
-            echom 'Cannot convert to list unless surrounded by bank lines.'
+            redraw | echo 'Cannot convert to list unless surrounded by bank lines.'
             echohl None
         endif
         call listmode#ReformatList()
