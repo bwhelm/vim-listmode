@@ -1,4 +1,4 @@
-" vim: set fdm=marker et ts=4 sw=4 sts=4:
+" vim: set fdm=marker:
 " listmode.vim - Vim: List mode, especially for pandoc version of markdown
 " Author:        bwhelm
 " Version:       0.2

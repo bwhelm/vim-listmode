@@ -1,4 +1,4 @@
-" vim: set fdm=marker et ts=4 sw=4 sts=4:
+" vim: set fdm=marker:
 
 " =============================================================================
 " Cope with mappings
