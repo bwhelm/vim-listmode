@@ -6,7 +6,7 @@
 
 function! s:RestoreMapping(mapDict, key, mode) abort  "{{{1
     " Restores mapping saved in mapDict
-    execute a:mode . 'unmap <buffer> ' . a:key
+    execute a:mode . 'unmap <buffer>' a:key
     if !empty(a:mapDict)
         execute (a:mapDict.noremap ? a:mapDict.mode . 'noremap' : a:mapDict.mode .'map') .
             \ (a:mapDict.buffer ? ' <buffer>' : '') .
@@ -874,5 +874,5 @@ function! s:FoldText() abort  "{{{1
     " Provide text for line when folded
     let l:foldLineCount = v:foldend - v:foldstart
     return v:folddashes . getline(v:foldstart)[:max([0, winwidth(0) - 24])]
-            \ . ' / ' . l:foldLineCount . ' sub-items / '
+            \ . ' /' l:foldLineCount 'sub-items / '
 endfunction
