@@ -87,7 +87,7 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
 
     if a:showMessages
         echohl Comment
-        echo 'Now entering vim list mode'
+        redraw | echo 'Now entering vim list mode'
         echohl None
     endif
 endfunction
@@ -134,7 +134,7 @@ function! s:ListModeOff(showMessages) abort  "{{{1
     endif
     if a:showMessages
         echohl Comment
-        echo 'Now leaving vim list mode'
+        redraw | echo 'Now leaving vim list mode'
         echohl None
     endif
 endfunction
@@ -548,7 +548,7 @@ function! s:OutdentLine() abort  "{{{1
         let l:newCursorColumn = <SID>PlaceCursor(s:line, l:prefix, s:cursorColumn)
     else
         echohl WarningMsg
-        echo 'Cannot outdent any further!'
+        redraw | echo 'Cannot outdent any further!'
         echohl None
         return
     endif
@@ -583,7 +583,7 @@ function! s:ChangeListType(listRotation) abort  "{{{1
     endif
     if s:currentListType ==# 'dl'
         echohl WarningMsg
-        echo 'Cannot change list type of description lists.'
+        redraw | echo 'Cannot change list type of description lists.'
         echohl None
         return
     endif
@@ -744,7 +744,7 @@ function! s:CurrentListItem(matchPattern) abort  "{{{1
     let l:startPosition = match(l:thisLine, a:matchPattern)
     if l:startPosition == -1
         echohl WarningMsg
-        echo 'Not a list item!'
+        redraw | echo 'Not a list item!'
         echohl None
         return 0
     else
@@ -810,7 +810,7 @@ function! s:CurrentListTree(type) abort  "{{{1
         return ['V', [l:a, l:startLine, 0, 0], [l:a, l:endLine, 0, 0]]
     else
         echohl WarningMsg
-        echo 'Not a list item!'
+        redraw | echo 'Not a list item!'
         echohl None
         return 0
     endif
