@@ -76,7 +76,7 @@ let g:ListMode_list_rotation_backward = get(g:, 'ListMode_list_rotation_backward
 " Text Objects -- define these only if vim-textobj-user is loaded
 " =============================================================================
 
-try
+if &runtimepath =~# 'textobj-user'  " If textobj-user is loaded
     call textobj#user#plugin('listmode', {
     \   'listitem': {
             \ 'select-a-function': 'listmode#CurrentListItemA',
@@ -91,4 +91,4 @@ try
             \ 'select-i': 'i' . g:ListModeTree_textobj,
         \ },
     \ })
-endtry
+endif
