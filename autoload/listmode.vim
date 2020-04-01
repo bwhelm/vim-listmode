@@ -126,12 +126,6 @@ function! s:ListModeOff(showMessages) abort  "{{{1
             \ g:ListMode_separator, 'i')
     let b:listmode=0
 
-    " Restore folding
-    if g:ListMode_folding != 0
-        let &l:foldmethod=b:oldfoldmethod
-        let &l:foldexpr=b:oldfoldexpr
-        let &l:foldtext=b:oldfoldtext
-    endif
     if a:showMessages
         echohl Comment
         redraw | echo 'Now leaving vim list mode'

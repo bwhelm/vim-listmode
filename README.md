@@ -50,9 +50,6 @@ is toggled off, the old mappings are restored.
 ListMode can be configured to remap "o" and "O" to insert list headers as
 appropriate. This option is set through *g:ListMode_remap_oO*.
 
-Toggling ListMode on optionally changes the folds in a document. This option is
-set through *g:ListMode_folding*.
-
 ListMode defines a list item text object, so that in normal mode typing "cil"
 will delete the current list item, not including the list prefix, and put vim
 into insert mode. Similarly, typing "dal" in normal mode will delete the
@@ -200,9 +197,6 @@ rotations is determined by *g:ListMode_list_rotation_forward*.
 - **g:ListMode_remap_oO**=1. This determines whether invoking ListMode remaps
   "o" and "O" to insert lines below or above the current line with the
   appropriate list header.
-
-- **g:ListMode_folding**=1. This determines whether ListMode changes the
-  document's folds while it is in effect. (1 is on; 0 is off.)
 
 - **g:ListMode_textobj**="l". This changes the character that designates the list
   text object.

@@ -2,7 +2,6 @@ g:ListMode_changetype_backward_insert    doc/listmode.txt    /*g:ListMode_change
 g:ListMode_changetype_backward_normal    doc/listmode.txt    /*g:ListMode_changetype_backward_normal*
 g:ListMode_changetype_forward_insert    doc/listmode.txt    /*g:ListMode_changetype_forward_insert*
 g:ListMode_changetype_forward_normal    doc/listmode.txt    /*g:ListMode_changetype_forward_normal*
-g:ListMode_folding    doc/listmode.txt    /*g:ListMode_folding*
 g:ListMode_indent_insert    doc/listmode.txt    /*g:ListMode_indent_insert*
 g:ListMode_indent_normal    doc/listmode.txt    /*g:ListMode_indent_normal*
 g:ListMode_list_rotation_backward    doc/listmode.txt    /*g:ListMode_list_rotation_backward*
