@@ -482,10 +482,6 @@ function! listmode#ReformatList(...) abort  "{{{1
             if l:listType ==# 'ls'
                 let l:listSeparatorFlag = l:listLevel
             elseif l:LRType ==# 'ol'
-                " echom l:levelRecord l:listLevel
-                " if len(l:LRNumber) == 1
-                "     let l:newItemPrefix .= ' '
-                " endif
                 let l:newItemPrefix .= l:LRNumber . '. '
             elseif l:LRType ==# 'el'
                 if <SID>IsExampleList(s:bufferText[l:key])
@@ -659,7 +655,6 @@ function! s:NewListItem() abort  "{{{1
         let s:cursorColumn -= 1  " Needed adjustment for normal mode.
     endif
     let l:lineContent = <SID>LineContent(s:line)
-    echom l:lineContent . '|' . s:currentListType . '|' . <SID>IsWhiteSpace(l:lineContent)
     if s:currentListType ==# 'empty'
         if s:line ==# ''
             " If the current line really is empty (rather than whitespace),
@@ -773,7 +768,6 @@ function! s:CurrentListTree(type) abort  "{{{1
         if a:type ==# 'a'  " Around list tree -- so search backwards
             for l:startLine in range(l:b, 1, -1)
                 let l:tempLine = getline(l:startLine)
-                " echom l:startLine . ':' . <SID>IsList(l:tempLine) . '|' . <SID>IsWhiteSpace(l:tempLine)
                 if <SID>FindLevel(l:tempLine) < l:indentLevel &&
                         \ !s:IsWhiteSpace(l:tempLine)
                     break
@@ -790,11 +784,9 @@ function! s:CurrentListTree(type) abort  "{{{1
         while <SID>IsWhiteSpace(getline(l:startLine))
             let l:startLine += 1
         endwhile
-        " echom l:startLine
         let l:endLine = line('$')
         for l:endLine in range(l:b + 1, line('$'))
             let l:tempLine = getline(l:endLine)
-            " echom l:endLine . ':' . <SID>IsList(l:tempLine) . '|' . <SID>IsWhiteSpace(l:tempLine)
             if <SID>FindLevel(getline(l:endLine)) < l:indentLevel &&
                     \ !s:IsWhiteSpace(getline(l:endLine))
                 let l:endLine -= 1
@@ -805,7 +797,6 @@ function! s:CurrentListTree(type) abort  "{{{1
                 break
             endif
         endfor
-        " echom l:endLine
         return ['V', [l:a, l:startLine, 0, 0], [l:a, l:endLine, 0, 0]]
     else
         echohl WarningMsg
