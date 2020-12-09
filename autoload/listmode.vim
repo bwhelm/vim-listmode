@@ -233,10 +233,10 @@ function! s:FindListType(line) abort  "{{{1
         return 'ul'
     elseif <SID>IsNumberedList(a:line)
         return 'nl'
-    elseif <SID>IsExampleList(a:line)
-        return 'el'
     elseif <SID>IsListSeparator(a:line)
         return 'ls'
+    elseif <SID>IsExampleList(a:line)
+        return 'el'
     elseif a:line =~# '^\s*[~:]\s'
         return 'dl'
     elseif <SID>IsIndentedText(a:line)
@@ -389,8 +389,11 @@ function! s:InitializeListFunctions() abort  "{{{1
     let [s:listBeginLineNumber, s:listEndLineNumber, s:listStructure] =
             \ <SID>FindListScope()
     if s:listEndLineNumber != 0  " Currently in a list...
-        let [s:currentListType, s:currentListNumbering] =
-                \ s:listStructure[s:lineNumber]
+        try
+            let [s:currentListType, s:currentListNumbering] =
+                    \ s:listStructure[s:lineNumber]
+        catch /E716/
+        endtry
     else  " Not in a list...
         let s:currentListType = 'nolist'
         let s:currentListNumbering = 0
@@ -423,7 +426,7 @@ function! listmode#ReformatList(...) abort  "{{{1
     for l:i in range(20)
         let l:levelRecord += [['empty', 0]]
     endfor
-    let l:listSeparatorFlag = 0
+    let l:listSeparatorFlag = -1
     let l:previousLevel = -1
     let l:newCursorColumn = s:cursorColumn
     let l:newList = []
@@ -446,33 +449,44 @@ function! listmode#ReformatList(...) abort  "{{{1
             elseif l:listLevel < l:previousLevel  " List parent
                 if l:LRType ==# 'empty'
                     if l:listType ==# 'ol'
+                        " if l:key > s:listBeginLineNumber && s:listStructure[l:key - 1][0] !=# 'ls'
+                        " endif
                         let l:levelRecord[l:listLevel] = ['ol', 1]
                     else
                         let l:levelRecord[l:listLevel] = [l:listType, 0]
                     endif
                 else
                     if l:LRType ==# 'ol'
+                        " if l:key > s:listBeginLineNumber && s:listStructure[l:key - 1][0] !=# 'ls' && s:listStructure[l:key - 1][1] >= l:listLevel
                         let l:levelRecord[l:listLevel] = ['ol', l:LRNumber + 1]
                     endif
                 endif
             endif
             " Now need to construct list item
             let [l:LRType, l:LRNumber] = l:levelRecord[l:listLevel]
-            if l:listSeparatorFlag && l:listType !=# 'empty'
+            if l:listSeparatorFlag >= 0 && l:listType !=# 'empty'
                 let l:LRType = l:listType
                 if l:listType ==# 'ol'
-                    let l:LRNumber = 1
+                    if l:listSeparatorFlag <= l:listLevel
+                        let l:LRNumber = 1
+                        if l:listSeparatorFlag == l:listLevel
+                            let l:listSeparatorFlag = -1
+                        endif
+                    endif
                 else
                     let l:LRNumber = 0
                 endif
                 let l:levelRecord[l:listLevel] = [l:LRType, l:LRNumber]
-                let l:listSeparatorFlag = 0
+                if l:listLevel <= l:listSeparatorFlag
+                    let l:listSeparatorFlag = -1
+                endif
             endif
             let l:itemText = <SID>LineContent(s:bufferText[l:key])
             let l:newItemPrefix = repeat(s:IndentText(), l:listLevel)
             if l:listType ==# 'ls'
-                let l:listSeparatorFlag = 1
+                let l:listSeparatorFlag = l:listLevel
             elseif l:LRType ==# 'ol'
+                " echom l:levelRecord l:listLevel
                 " if len(l:LRNumber) == 1
                 "     let l:newItemPrefix .= ' '
                 " endif
@@ -509,6 +523,10 @@ endfunction
 function! s:IndentLine() abort  "{{{1
     " Indent current line, changing list type of lines as appropriate
     call <SID>InitializeListFunctions()
+    if !exists("s:currentListType")  " FIXME: This is a hack! Line is `<!---->`
+        normal! >>
+        return
+    endif
     let l:prefix = repeat(s:IndentText(), <SID>FindLevel(s:line) + 1)
     if s:currentListType ==# 'el'
         let l:prefix .= <SID>FindExampleListKey(s:line)
@@ -523,7 +541,9 @@ function! s:IndentLine() abort  "{{{1
     call setline(s:lineNumber + 1, l:newLine)
     call setpos('.', [s:bufferNumber, s:lineNumber + 1, l:newCursorColumn, s:cursorOffset])
     call listmode#ReformatList()
+    silent! call repeat#set("\<Plug>IndentLine", 1)
 endfunction
+nnoremap <silent> <Plug>IndentLine :call <SID>IndentLine()<CR>
 
 function! s:OutdentLine() abort  "{{{1
     " Outdent current line, changing list type of lines as appropriate
@@ -549,7 +569,9 @@ function! s:OutdentLine() abort  "{{{1
     call setline(s:lineNumber + 1, l:newLine)
     call setpos('.', [s:bufferNumber, s:lineNumber + 1, l:newCursorColumn, s:cursorOffset])
     call listmode#ReformatList()
+    silent! call repeat#set("\<Plug>OutdentLine", 1)
 endfunction
+noremap <silent> <Plug>OutdentLine :call <SID>OutdentLine()<CR>
 
 function! s:ChangeListType(listRotation) abort  "{{{1
     " ChangeListType() will search backwards and forwards in theList to find all
@@ -632,6 +654,7 @@ endfunction
 function! s:NewListItem() abort  "{{{1
     " Add new list item above or below current line (depending on whether the
     " cursor is before or after the start of the line content).
+    let l:savereg = @@
     call <SID>InitializeListFunctions()
     if s:listEndLineNumber == 0
         let s:currentListType = 'nolist'
@@ -705,6 +728,7 @@ function! s:NewListItem() abort  "{{{1
     call setpos('.', [s:bufferNumber, l:newLineNumber + 1,
             \ l:newCursorColumn + 1, s:cursorOffset])
     call listmode#ReformatList()
+    let @@ = l:savereg
 endfunction
 
 function! s:GoToStartOfListItem() abort  "{{{1
