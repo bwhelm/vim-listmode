@@ -73,12 +73,8 @@ function! listmode#ListModeOn(showMessages) abort  "{{{1
     if g:ListMode_remap_oO
         let b:listmode_o_mapping = maparg('o', 'n', 0, 1)
         let b:listmode_O_mapping = maparg('O', 'n', 0, 1)
-        " Note: We want these to involve ListMode's <CR>, so shouldn't use
-        " nnoremap`.
-        " TODO: Rewrite the `O` mapping to use a function and avoid changing
-        " registers.
         nnoremap <buffer> <silent> o A<C-\><C-o>:call <SID>NewListItem()<CR>
-        nnoremap <buffer> <silent> O A<C-\><C-o>:call <SID>NewListItem()<CR><Esc>"zddk"zP:ListModeReformat<CR>A
+        nnoremap <buffer> <silent> O A<C-\><C-o>:call <SID>NewListItem()<CR><Esc>:m--\|ListModeReformat<CR>A
     endif
     let b:listmode_separator_mapping = maparg(g:ListMode_separator, 'i', 0, 1)
     execute 'inoremap <buffer> <silent>' g:ListMode_separator '<C-]><!----><CR><CR>'
@@ -654,43 +650,31 @@ endfunction
 function! s:NewListItem() abort  "{{{1
     " Add new list item above or below current line (depending on whether the
     " cursor is before or after the start of the line content).
-    let l:savereg = @@
     call <SID>InitializeListFunctions()
     if s:listEndLineNumber == 0
-        let s:currentListType = 'nolist'
-        let s:currentListNumbering = 0
+        normal! o
+        return
     endif
     if mode() ==# 'n'
         let s:cursorColumn -= 1  " Needed adjustment for normal mode.
     endif
     let l:lineContent = <SID>LineContent(s:line)
+    echom l:lineContent . '|' . s:currentListType . '|' . <SID>IsWhiteSpace(l:lineContent)
     if s:currentListType ==# 'empty'
         if s:line ==# ''
             " If the current line really is empty (rather than whitespace),
-            " need to add new line below with arbitrary list type. (This will
-            " be fixed when calling listmode#ReformatList().)
-            let l:newLineType = 'ul'
-            for l:lineIndex in range(s:lineNumber - 1, s:listBeginLineNumber, -1)
-                let l:thisLine = s:bufferText[l:lineIndex]
-                if <SID>FindLevel(l:thisLine) == 0 &&
-                        \ index(['ol', 'ul', 'nl', 'el'], <SID>FindListType(l:thisLine)) >= 0
-                    let l:newLineType = <SID>FindListType(l:thisLine)
-                    break
-                endif
-            endfor
-            let l:newLine = s:listDef[l:newLineType]
-            let l:newCursorColumn = len(l:newLine)
-            call append(s:lineNumber + 1, l:newLine)
-            call setpos('.', [s:bufferNumber, s:lineNumber + 2,
-                        \ l:newCursorColumn, s:cursorOffset])
+            " add new line below and reformat.
+            normal! o- 
             call listmode#ReformatList()
             return
         else
-            " Current line is only whitespace, so outdent.
-            call <SID>OutdentLine()
+            " Current line is only whitespace, so create new empty line above
+            " (but leave current whitespace alone).
+            put! _
+            normal! j$
             return
         endif
-    elseif <SID>IsWhiteSpace(l:lineContent) && s:currentListType !=# 'nolist'
+    elseif <SID>IsWhiteSpace(l:lineContent)
         if s:currentLineLevel > 0
             " If indented, need to outdent.
             call <SID>OutdentLine()
@@ -704,20 +688,18 @@ function! s:NewListItem() abort  "{{{1
             return
         endif
     endif
+    " Split line at cursor, creating new list item
     let l:linePrefixLength = len(s:line) - len(l:lineContent)
     let l:prefix = repeat(s:IndentText(), s:currentLineLevel)
             \ . s:listDef[s:currentListType]
-    if (s:currentListType ==# 'nolist' && len(s:line) == 0) ||
-            \ l:linePrefixLength <= s:cursorColumn - 1
-        " If cursor is placed after start of line content: need to create new
-        " line below ... unless we're not in a list.
+    if l:linePrefixLength <= s:cursorColumn - 1
+        " If cursor is after start of line content: create new line below.
         let l:newLine = s:line[:s:cursorColumn - 1]
         let l:nextLine = l:prefix . s:line[s:cursorColumn :]
         let l:newLineNumber = s:lineNumber + 1
         let l:newCursorColumn = len(l:prefix)
     else
-        " Cursor is placed before start of line content: need to create new
-        " line above
+        " Cursor is before start of line content: create new line above.
         let l:nextLine = s:line
         let l:newLine = l:prefix
         let l:newLineNumber = s:lineNumber
@@ -728,7 +710,6 @@ function! s:NewListItem() abort  "{{{1
     call setpos('.', [s:bufferNumber, l:newLineNumber + 1,
             \ l:newCursorColumn + 1, s:cursorOffset])
     call listmode#ReformatList()
-    let @@ = l:savereg
 endfunction
 
 function! s:GoToStartOfListItem() abort  "{{{1
