@@ -647,18 +647,13 @@ function! s:NewListItem() abort  "{{{1
     " Add new list item above or below current line (depending on whether the
     " cursor is before or after the start of the line content).
     call <SID>InitializeListFunctions()
-    if s:listEndLineNumber == 0
-        normal! o
-        return
-    endif
     if mode() ==# 'n'
         let s:cursorColumn -= 1  " Needed adjustment for normal mode.
     endif
     let l:lineContent = <SID>LineContent(s:line)
-    if s:currentListType ==# 'empty'
-        if s:line ==# ''
-            " If the current line really is empty (rather than whitespace),
-            " add new line below and reformat.
+    if s:currentListType ==# 'empty'  " (rather than `nolist`)
+        if s:line ==# ''  " if current line really is empty (rather than whitespace)
+            " add new line below and reformat
             normal! o- 
             call listmode#ReformatList()
             return
@@ -669,14 +664,15 @@ function! s:NewListItem() abort  "{{{1
             normal! j$
             return
         endif
+    elseif s:line  ==# ''  " if `nolist` and empty
+        normal! o
+        return
     elseif <SID>IsWhiteSpace(l:lineContent)
-        if s:currentLineLevel > 0
-            " If indented, need to outdent.
+        " If in list but only whitespace...
+        if s:currentLineLevel > 0  " If indented, need to outdent.
             call <SID>OutdentLine()
             return
-        else
-            " If not indented but has list prefix, delete that prefix and
-            " relocate cursor.
+        else  " If not indented, delete list prefix and relocate cursor.
             call setline(s:lineNumber + 1, '')
             call setpos('.', [s:bufferNumber, s:lineNumber + 1, 0, s:cursorOffset])
             call listmode#ReformatList()
